@@ -1,15 +1,18 @@
 package com.medisync.medisync.domain.entities;
 
-
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Data
 @Table(name = "gestores")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Gestor {
 
     @Id
@@ -35,8 +38,4 @@ public class Gestor {
     private BigDecimal latitud;
 
     private BigDecimal longitud;
-
-
 }
-
-
