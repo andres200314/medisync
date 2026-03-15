@@ -1,6 +1,9 @@
 spring:
   application:
     name: medisync
+  session:
+    jdbc:
+      initialize-schema: never
 
   datasource:
     url: jdbc:postgresql://localhost:5432/medisync_db
