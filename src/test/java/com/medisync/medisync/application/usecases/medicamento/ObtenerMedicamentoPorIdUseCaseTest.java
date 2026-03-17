@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.application.exceptions.MedicamentoNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.entities.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 

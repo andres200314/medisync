@@ -1,6 +1,6 @@
 package com.medisync.medisync.application.usecases.medicamento;
 
-import com.medisync.medisync.application.exceptions.MedicamentoNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 import org.springframework.stereotype.Service;
 
