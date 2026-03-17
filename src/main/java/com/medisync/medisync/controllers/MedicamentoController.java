@@ -2,6 +2,7 @@ package com.medisync.medisync.controllers;
 
 import java.util.List;
 
+import com.medisync.medisync.application.mappers.MedicamentoMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,46 +23,23 @@ public class MedicamentoController {
 
     private final CrearMedicamentoUseCase crearMedicamentoUseCase;
     private final ObtenerMedicamentosUseCase obtenerMedicamentosUseCase;
+    private final MedicamentoMapper mapper;
 
-    public MedicamentoController(CrearMedicamentoUseCase crearMedicamentoUseCase,
-                                  ObtenerMedicamentosUseCase obtenerMedicamentosUseCase) {
+    public MedicamentoController(MedicamentoMapper mapper, CrearMedicamentoUseCase crearMedicamentoUseCase, ObtenerMedicamentosUseCase obtenerMedicamentosUseCase) {
         this.crearMedicamentoUseCase = crearMedicamentoUseCase;
         this.obtenerMedicamentosUseCase = obtenerMedicamentosUseCase;
+        this.mapper = mapper;
     }
 
     @PostMapping
     public ResponseEntity<MedicamentoResponseDTO> crear(@RequestBody MedicamentoRequestDTO request) {
-        Medicamento medicamento = Medicamento.builder()
-                .nombre(request.getNombre())
-                .requiereFormula(request.getRequiereFormula())
-                .descripcion(request.getDescripcion())
-                .build();
-
-        Medicamento creado = crearMedicamentoUseCase.ejecutar(medicamento);
-
-        MedicamentoResponseDTO response = MedicamentoResponseDTO.builder()
-                .id(creado.getId())
-                .nombre(creado.getNombre())
-                .requiereFormula(creado.getRequiereFormula())
-                .descripcion(creado.getDescripcion())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        Medicamento creado = crearMedicamentoUseCase.ejecutar(mapper.toEntity(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
     }
 
     @GetMapping
     public ResponseEntity<List<MedicamentoResponseDTO>> obtenerTodos() {
         List<Medicamento> medicamentos = obtenerMedicamentosUseCase.ejecutar();
-
-        List<MedicamentoResponseDTO> response = medicamentos.stream()
-                .map(m -> MedicamentoResponseDTO.builder()
-                        .id(m.getId())
-                        .nombre(m.getNombre())
-                        .requiereFormula(m.getRequiereFormula())
-                        .descripcion(m.getDescripcion())
-                        .build())
-                .toList();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(medicamentos.stream().map(mapper::toResponse).toList());
     }
 }
