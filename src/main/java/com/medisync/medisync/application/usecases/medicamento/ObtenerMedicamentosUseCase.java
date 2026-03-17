@@ -1,20 +1,21 @@
 package com.medisync.medisync.application.usecases.medicamento;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.medisync.medisync.domain.entities.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
-// CrearMedicamentoUseCase.java
 @Service
-public class CrearMedicamentoUseCase {
+public class ObtenerMedicamentosUseCase {
     private final IMedicamentoRepository medicamentoRepository;
 
-    public CrearMedicamentoUseCase(IMedicamentoRepository medicamentoRepository) {
+    public ObtenerMedicamentosUseCase(IMedicamentoRepository medicamentoRepository) {
         this.medicamentoRepository = medicamentoRepository;
     }
 
-    public Medicamento ejecutar(Medicamento medicamento) {
-        return medicamentoRepository.save(medicamento);
+    public List<Medicamento> ejecutar() {
+        return medicamentoRepository.findAll();
     }
 }

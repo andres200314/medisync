@@ -1,17 +1,22 @@
 package com.medisync.medisync.application.usecases.medicamento;
 
-import com.medisync.medisync.domain.entities.Medicamento;
-import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CrearMedicamentoUseCaseTest {
