@@ -1,10 +1,13 @@
 package com.medisync.medisync.application.mappers;
 
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Component;
+
 import com.medisync.medisync.application.dto.medicamento.MedicamentoRequestDTO;
 import com.medisync.medisync.application.dto.medicamento.MedicamentoResponseDTO;
 import com.medisync.medisync.domain.entities.Medicamento;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MedicamentoMapper {
@@ -25,4 +28,13 @@ public class MedicamentoMapper {
                 .descripcion(medicamento.getDescripcion())
                 .build();
     }
+
+    public Medicamento toEntityConId(UUID id, MedicamentoRequestDTO dto) {
+    return Medicamento.builder()
+            .id(id)
+            .nombre(dto.getNombre())
+            .requiereFormula(dto.getRequiereFormula())
+            .descripcion(dto.getDescripcion())
+            .build();
+}
 }
