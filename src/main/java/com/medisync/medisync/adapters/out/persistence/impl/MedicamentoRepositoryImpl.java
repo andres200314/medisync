@@ -1,8 +1,8 @@
-package com.medisync.medisync.infrastructure.persistence.impl;
+package com.medisync.medisync.adapters.out.persistence.impl;
 
 import com.medisync.medisync.domain.entities.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
-import com.medisync.medisync.infrastructure.persistence.jpa.MedicamentoJpaRepository;
+import com.medisync.medisync.adapters.out.persistence.jpa.MedicamentoJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

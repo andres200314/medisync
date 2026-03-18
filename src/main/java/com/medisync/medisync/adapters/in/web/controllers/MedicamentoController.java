@@ -1,4 +1,4 @@
-package com.medisync.medisync.controllers;
+package com.medisync.medisync.adapters.in.web.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.medisync.medisync.application.dto.medicamento.MedicamentoRequestDTO;
-import com.medisync.medisync.application.dto.medicamento.MedicamentoResponseDTO;
-import com.medisync.medisync.application.mappers.MedicamentoMapper;
+import com.medisync.medisync.adapters.in.web.dto.medicamento.MedicamentoRequestDTO;
+import com.medisync.medisync.adapters.in.web.dto.medicamento.MedicamentoResponseDTO;
+import com.medisync.medisync.adapters.in.web.mappers.MedicamentoMapper;
 import com.medisync.medisync.application.usecases.medicamento.ActualizarMedicamentoUseCase;
 import com.medisync.medisync.application.usecases.medicamento.CrearMedicamentoUseCase;
 import com.medisync.medisync.application.usecases.medicamento.EliminarMedicamentoUseCase;

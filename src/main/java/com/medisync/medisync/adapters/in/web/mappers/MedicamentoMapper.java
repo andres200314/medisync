@@ -1,12 +1,12 @@
-package com.medisync.medisync.application.mappers;
+package com.medisync.medisync.adapters.in.web.mappers;
 
 
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.medisync.medisync.application.dto.medicamento.MedicamentoRequestDTO;
-import com.medisync.medisync.application.dto.medicamento.MedicamentoResponseDTO;
+import com.medisync.medisync.adapters.in.web.dto.medicamento.MedicamentoRequestDTO;
+import com.medisync.medisync.adapters.in.web.dto.medicamento.MedicamentoResponseDTO;
 import com.medisync.medisync.domain.entities.Medicamento;
 
 @Component
