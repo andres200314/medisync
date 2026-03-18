@@ -1,4 +1,4 @@
-package com.medisync.medisync.application.exceptions;
+package com.medisync.medisync.domain.exceptions;
 
 import java.util.Map;
 

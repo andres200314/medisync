@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.medisync.medisync.application.exceptions.MedicamentoNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.entities.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
