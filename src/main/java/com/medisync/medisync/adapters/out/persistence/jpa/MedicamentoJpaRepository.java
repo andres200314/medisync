@@ -1,4 +1,4 @@
-package com.medisync.medisync.infrastructure.persistence.jpa;
+package com.medisync.medisync.adapters.out.persistence.jpa;
 
 import com.medisync.medisync.domain.entities.Medicamento;
 import org.springframework.data.jpa.repository.JpaRepository;
