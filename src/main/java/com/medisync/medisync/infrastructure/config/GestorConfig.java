@@ -1,5 +1,6 @@
 package com.medisync.medisync.infrastructure.config;
 
+import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,5 +21,10 @@ public class GestorConfig {
     @Bean
     public ObtenerGestoresUseCase obtenerGestoresUseCase(IGestorRepository gestorRepository) {
         return new ObtenerGestoresUseCase(gestorRepository);
+    }
+
+    @Bean
+    public ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase(IGestorRepository gestorRepository) {
+        return new ObtenerGestorPorIdUseCase(gestorRepository);
     }
 }

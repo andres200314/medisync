@@ -1,14 +1,12 @@
 package com.medisync.medisync.adapters.in.web.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorRequestDTO;
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorResponseDTO;
@@ -23,13 +21,17 @@ public class GestorController {
 
     private final CrearGestorUseCase crearGestorUseCase;
     private final ObtenerGestoresUseCase obtenerGestoresUseCase;
+    private final ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase;
+
     private final GestorMapper mapper;
 
     public GestorController(GestorMapper mapper,
-                             CrearGestorUseCase crearGestorUseCase,
-                             ObtenerGestoresUseCase obtenerGestoresUseCase) {
+                            CrearGestorUseCase crearGestorUseCase,
+                            ObtenerGestoresUseCase obtenerGestoresUseCase,
+                            ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase) {
         this.crearGestorUseCase = crearGestorUseCase;
         this.obtenerGestoresUseCase = obtenerGestoresUseCase;
+        this.obtenerGestorPorIdUseCase = obtenerGestorPorIdUseCase;
         this.mapper = mapper;
     }
 
@@ -43,5 +45,11 @@ public class GestorController {
     public ResponseEntity<List<GestorResponseDTO>> obtenerTodos() {
         List<Gestor> gestores = obtenerGestoresUseCase.ejecutar();
         return ResponseEntity.ok(gestores.stream().map(mapper::toResponse).toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GestorResponseDTO> obtenerPorId(@PathVariable UUID id) {
+        Gestor gestor = obtenerGestorPorIdUseCase.ejecutar(id);
+        return ResponseEntity.ok(mapper.toResponse(gestor));
     }
 }
