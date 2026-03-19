@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.medisync.medisync.application.usecases.gestor.CrearGestorUseCase;
+import com.medisync.medisync.application.usecases.gestor.ObtenerGestoresUseCase;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 @Configuration
@@ -14,5 +15,10 @@ public class GestorConfig {
     public CrearGestorUseCase crearGestorUseCase(IGestorRepository gestorRepository,
                                                   BCryptPasswordEncoder passwordEncoder) {
         return new CrearGestorUseCase(gestorRepository, passwordEncoder);
+    }
+
+    @Bean
+    public ObtenerGestoresUseCase obtenerGestoresUseCase(IGestorRepository gestorRepository) {
+        return new ObtenerGestoresUseCase(gestorRepository);
     }
 }
