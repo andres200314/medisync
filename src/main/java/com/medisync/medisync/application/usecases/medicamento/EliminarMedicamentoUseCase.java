@@ -1,10 +1,9 @@
 package com.medisync.medisync.application.usecases.medicamento;
 
+import java.util.UUID;
+
 import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 
 public class EliminarMedicamentoUseCase {
