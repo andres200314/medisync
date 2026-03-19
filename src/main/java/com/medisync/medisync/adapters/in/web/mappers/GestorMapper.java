@@ -17,7 +17,7 @@ public class GestorMapper {
                 .direccion(dto.getDireccion())
                 .telefono(dto.getTelefono())
                 .email(dto.getEmail())
-                .passwordHash(dto.getPasswordHash())
+                .passwordHash(dto.getPassword())
                 .latitud(dto.getLatitud())
                 .longitud(dto.getLongitud())
                 .build();

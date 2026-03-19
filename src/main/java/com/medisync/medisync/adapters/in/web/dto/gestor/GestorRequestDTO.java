@@ -19,7 +19,7 @@ public class GestorRequestDTO {
     private String direccion;
     private String telefono;
     private String email;
-    private String passwordHash;
+    private String password;
     private BigDecimal latitud;
     private BigDecimal longitud;
 }
