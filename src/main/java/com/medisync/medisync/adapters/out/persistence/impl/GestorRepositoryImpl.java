@@ -4,24 +4,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import com.medisync.medisync.adapters.out.persistence.entities.GestorEntity;
 import com.medisync.medisync.adapters.out.persistence.jpa.GestorJpaRepository;
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.adapters.out.persistence.mappers.GestorEntityMapper;
+import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 @Repository
+@RequiredArgsConstructor
 public class GestorRepositoryImpl implements IGestorRepository {
 
     private final GestorJpaRepository jpaRepository;
-
-    public GestorRepositoryImpl(GestorJpaRepository jpaRepository) {
-        this.jpaRepository = jpaRepository;
-    }
+    private final GestorEntityMapper entityMapper;
 
     @Override
     public Gestor save(Gestor gestor) {
-        return jpaRepository.save(gestor);
+        GestorEntity entity = entityMapper.toEntity(gestor);
+        GestorEntity saved = jpaRepository.save(entity);
+        return entityMapper.toDomain(saved);
     }
 
     @Override
@@ -31,11 +34,14 @@ public class GestorRepositoryImpl implements IGestorRepository {
 
     @Override
     public Optional<Gestor> findById(UUID id) {
-        return jpaRepository.findById(id);
+        return jpaRepository.findById(id)
+                .map(entityMapper::toDomain);
     }
 
     @Override
     public List<Gestor> findAll() {
-        return jpaRepository.findAll();
+        return jpaRepository.findAll().stream()
+                .map(entityMapper::toDomain)
+                .toList();
     }
 }

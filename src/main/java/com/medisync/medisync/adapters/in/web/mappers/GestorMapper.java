@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorRequestDTO;
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorResponseDTO;
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 
 
 @Component

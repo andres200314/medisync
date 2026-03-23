@@ -1,7 +1,7 @@
 package com.medisync.medisync.application.usecases.medicamento;
 
 
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
 // CrearMedicamentoUseCase.java

@@ -2,7 +2,7 @@ package com.medisync.medisync.application.usecases.gestor;
 
 import java.util.List;
 
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 public class ObtenerGestoresUseCase {

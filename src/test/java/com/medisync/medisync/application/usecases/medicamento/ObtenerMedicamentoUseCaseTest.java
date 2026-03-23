@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,9 +89,9 @@ class ObtenerMedicamentosUseCaseTest {
         List<Medicamento> resultado = obtenerMedicamentosUseCase.ejecutar();
 
         // ASSERT
-        assertEquals(id, resultado.get(0).getId());
-        assertEquals("Amoxicilina", resultado.get(0).getNombre());
-        assertTrue(resultado.get(0).getRequiereFormula());
-        assertEquals("Antibiótico", resultado.get(0).getDescripcion());
+        assertEquals(id, resultado.getFirst().getId());
+        assertEquals("Amoxicilina", resultado.getFirst().getNombre());
+        assertTrue(resultado.getFirst().getRequiereFormula());
+        assertEquals("Antibiótico", resultado.getFirst().getDescripcion());
     }
 }

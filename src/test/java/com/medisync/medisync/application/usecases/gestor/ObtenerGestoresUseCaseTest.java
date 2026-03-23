@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -105,11 +105,11 @@ class ObtenerGestoresUseCaseTest {
         List<Gestor> resultado = obtenerGestoresUseCase.ejecutar();
 
         // ASSERT
-        assertEquals(id, resultado.get(0).getId());
-        assertEquals("Farmacia Central", resultado.get(0).getNombre());
-        assertEquals("900123456-1", resultado.get(0).getNit());
-        assertEquals("farmacia@central.com", resultado.get(0).getEmail());
-        assertEquals(new BigDecimal("6.2442"), resultado.get(0).getLatitud());
-        assertEquals(new BigDecimal("-75.5812"), resultado.get(0).getLongitud());
+        assertEquals(id, resultado.getFirst().getId());
+        assertEquals("Farmacia Central", resultado.getFirst().getNombre());
+        assertEquals("900123456-1", resultado.getFirst().getNit());
+        assertEquals("farmacia@central.com", resultado.getFirst().getEmail());
+        assertEquals(new BigDecimal("6.2442"), resultado.getFirst().getLatitud());
+        assertEquals(new BigDecimal("-75.5812"), resultado.getFirst().getLongitud());
     }
 }

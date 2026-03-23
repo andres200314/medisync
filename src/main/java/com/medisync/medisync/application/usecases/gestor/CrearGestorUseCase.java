@@ -2,7 +2,7 @@ package com.medisync.medisync.application.usecases.gestor;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 public class CrearGestorUseCase {

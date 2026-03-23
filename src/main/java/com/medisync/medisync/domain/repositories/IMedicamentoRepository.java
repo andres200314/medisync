@@ -1,6 +1,6 @@
 package com.medisync.medisync.domain.repositories;
 
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.models.Medicamento;
 
 import java.util.List;
 import java.util.Optional;
