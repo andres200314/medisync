@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 
 
 public interface IGestorRepository {

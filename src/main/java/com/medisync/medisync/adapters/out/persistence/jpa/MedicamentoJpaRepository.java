@@ -1,9 +1,9 @@
 package com.medisync.medisync.adapters.out.persistence.jpa;
 
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.adapters.out.persistence.entities.MedicamentoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface MedicamentoJpaRepository extends JpaRepository<Medicamento, UUID> {
+public interface MedicamentoJpaRepository extends JpaRepository<MedicamentoEntity, UUID> {
 }

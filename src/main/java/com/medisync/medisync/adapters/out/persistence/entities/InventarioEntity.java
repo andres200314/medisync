@@ -1,4 +1,5 @@
-package com.medisync.medisync.domain.entities;
+package com.medisync.medisync.adapters.out.persistence.entities;
+
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Inventario {
+public class InventarioEntity {
 
     @Id
     @GeneratedValue
@@ -21,11 +22,11 @@ public class Inventario {
 
     @ManyToOne
     @JoinColumn(name = "medicamento_id", nullable = false)
-    private Medicamento medicamento;
+    private MedicamentoEntity medicamento;
 
     @ManyToOne
     @JoinColumn(name = "gestor_id", nullable = false)
-    private Gestor gestor;
+    private GestorEntity gestor;
 
     @Column(nullable = false)
     private Integer cantidad;

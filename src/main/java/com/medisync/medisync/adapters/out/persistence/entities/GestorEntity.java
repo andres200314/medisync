@@ -1,4 +1,4 @@
-package com.medisync.medisync.domain.entities;
+package com.medisync.medisync.adapters.out.persistence.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Gestor {
+public class GestorEntity {
 
     @Id
     @GeneratedValue

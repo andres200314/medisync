@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.domain.entities.Gestor;
+import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 @ExtendWith(MockitoExtension.class)
 class ObtenerGestorPorIdUseCaseTest {

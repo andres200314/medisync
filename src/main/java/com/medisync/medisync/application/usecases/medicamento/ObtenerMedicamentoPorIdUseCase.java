@@ -5,7 +5,7 @@ import java.util.UUID;
 
 
 import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
 

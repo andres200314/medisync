@@ -1,8 +1,7 @@
-package com.medisync.medisync.domain.entities;
+package com.medisync.medisync.adapters.out.persistence.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 
 import java.util.UUID;
 
@@ -13,8 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Medicamento {
-
+public class MedicamentoEntity {
     @Id
     @GeneratedValue
     private UUID id;

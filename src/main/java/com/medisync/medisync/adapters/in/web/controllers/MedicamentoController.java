@@ -3,6 +3,7 @@ package com.medisync.medisync.adapters.in.web.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,10 +23,11 @@ import com.medisync.medisync.application.usecases.medicamento.CrearMedicamentoUs
 import com.medisync.medisync.application.usecases.medicamento.EliminarMedicamentoUseCase;
 import com.medisync.medisync.application.usecases.medicamento.ObtenerMedicamentoPorIdUseCase;
 import com.medisync.medisync.application.usecases.medicamento.ObtenerMedicamentosUseCase;
-import com.medisync.medisync.domain.entities.Medicamento;
+import com.medisync.medisync.domain.models.Medicamento;
 
 @RestController
 @RequestMapping("/api/medicamentos")
+@RequiredArgsConstructor
 public class MedicamentoController {
 
     private final CrearMedicamentoUseCase crearMedicamentoUseCase;
@@ -33,25 +35,12 @@ public class MedicamentoController {
     private final ObtenerMedicamentoPorIdUseCase obtenerMedicamentoPorIdUseCase;
     private final EliminarMedicamentoUseCase eliminarMedicamentoUseCase;
     private final ActualizarMedicamentoUseCase actualizarMedicamentoUseCase;
-    
     private final MedicamentoMapper mapper;
 
-    public MedicamentoController(MedicamentoMapper mapper,
-                                 CrearMedicamentoUseCase crearMedicamentoUseCase,
-                                 ObtenerMedicamentosUseCase obtenerMedicamentosUseCase,
-                                 ObtenerMedicamentoPorIdUseCase obtenerMedicamentoPorIdUseCase, EliminarMedicamentoUseCase eliminarMedicamentoUseCase, ActualizarMedicamentoUseCase actualizarMedicamentoUseCase)
-                                  {
-        this.crearMedicamentoUseCase = crearMedicamentoUseCase;
-        this.obtenerMedicamentosUseCase = obtenerMedicamentosUseCase;
-        this.obtenerMedicamentoPorIdUseCase = obtenerMedicamentoPorIdUseCase;
-        this.mapper = mapper;
-        this.eliminarMedicamentoUseCase = eliminarMedicamentoUseCase;
-        this.actualizarMedicamentoUseCase = actualizarMedicamentoUseCase;
-    }
 
     @PostMapping
     public ResponseEntity<MedicamentoResponseDTO> crear(@RequestBody MedicamentoRequestDTO request) {
-        Medicamento creado = crearMedicamentoUseCase.ejecutar(mapper.toEntity(request));
+        Medicamento creado = crearMedicamentoUseCase.ejecutar(mapper.toDomain(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
     }
 
@@ -75,7 +64,7 @@ public class MedicamentoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicamentoResponseDTO> actualizar(@PathVariable("id") UUID id, @RequestBody MedicamentoRequestDTO request) {
-    Medicamento actualizado = actualizarMedicamentoUseCase.ejecutar(id, mapper.toEntity(request));
+    Medicamento actualizado = actualizarMedicamentoUseCase.ejecutar(id, mapper.toDomain(request));
     return ResponseEntity.ok(mapper.toResponse(actualizado));
     }
 
