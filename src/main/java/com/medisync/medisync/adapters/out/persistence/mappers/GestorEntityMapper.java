@@ -1,8 +1,9 @@
 package com.medisync.medisync.adapters.out.persistence.mappers;
 
+import org.springframework.stereotype.Component;
+
 import com.medisync.medisync.adapters.out.persistence.entities.GestorEntity;
 import com.medisync.medisync.domain.models.Gestor;
-import org.springframework.stereotype.Component;
 
 
 @Component
