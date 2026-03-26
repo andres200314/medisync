@@ -11,4 +11,8 @@ public record Nombre(String valor) {
         }
         valor = valor.trim();
     }
+
+    public static Nombre of(String valor) {
+        return new Nombre(valor);
+    }
 }

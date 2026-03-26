@@ -7,10 +7,14 @@ import java.util.UUID;
 import com.medisync.medisync.domain.models.Inventario;
 
 public interface IInventarioRepository {
+
     Inventario save(Inventario inventario);
+
     void deleteById(UUID id);
+
     Optional<Inventario> findById(UUID id);
+
     List<Inventario> findAll();
-    List<Inventario> findByGestorId(UUID gestorId);
-    List<Inventario> findByMedicamentoIdAndGestorId(UUID medicamentoId, UUID gestorId);
+
+    Optional<Inventario> findByGestorId(UUID gestorId);  // ← Optional, no List
 }
