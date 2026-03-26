@@ -1,29 +1,27 @@
 package com.medisync.medisync.application.usecases.inventario;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import com.medisync.medisync.domain.valueobjects.Nombre;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.medisync.medisync.domain.enums.EstadoGestor;
+import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IInventarioRepository;
+import com.medisync.medisync.domain.valueobjects.*;
 
 @ExtendWith(MockitoExtension.class)
 class CrearInventarioUseCaseTest {
@@ -35,112 +33,189 @@ class CrearInventarioUseCaseTest {
     private CrearInventarioUseCase crearInventarioUseCase;
 
     @Test
-    void deberiaCrearInventarioExitosamente() {
+    void deberiaCrearInventarioConItemsExitosamente() {
         // ARRANGE
         UUID medicamentoId = UUID.randomUUID();
         UUID gestorId = UUID.randomUUID();
 
-        Inventario inventario = Inventario.builder()
-                .medicamento(Medicamento.builder().id(medicamentoId).build())
-                .gestor(Gestor.builder().id(gestorId).build())
-                .cantidad(50)
-                .precioUnitario(new BigDecimal("12500.00"))
+        // Crear Value Objects
+        Nombre nombreGestor = Nombre.of("Farmacia Central");
+        Cantidad cantidad = Cantidad.of(50);
+        Precio precio = Precio.of(BigDecimal.valueOf(12500.00));
+
+        // Crear gestor con estado ACTIVO
+        Gestor gestor = Gestor.builder()
+                .id(gestorId)
+                .nombre(nombreGestor)
+                .estado(EstadoGestor.ACTIVO)  // ← IMPORTANTE
                 .build();
 
+        Medicamento medicamento = Medicamento.builder()
+                .id(medicamentoId)
+                .nombre("Ibuprofeno")
+                .requiereFormula(false)
+                .build();
+
+        // Crear item de inventario
+        ItemInventario item = new ItemInventario(medicamento, cantidad, precio);
+
+        // Crear inventario con items
+        Inventario inventario = Inventario.builder()
+                .gestor(gestor)
+                .items(List.of(item))
+                .build();
+
+        // Inventario guardado (con ID generado)
         Inventario inventarioGuardado = Inventario.builder()
                 .id(UUID.randomUUID())
-                .medicamento(Medicamento.builder().id(medicamentoId).nombre("Ibuprofeno").build())
-                .gestor(Gestor.builder().id(gestorId).nombre(new Nombre("Farmacia Central")).build())
-                .cantidad(50)
-                .precioUnitario(new BigDecimal("12500.00"))
+                .gestor(gestor)
+                .items(List.of(item))
                 .build();
 
-        when(inventarioRepository.findByMedicamentoIdAndGestorId(medicamentoId, gestorId))
-                .thenReturn(List.of());
-        when(inventarioRepository.save(inventario)).thenReturn(inventarioGuardado);
+        when(inventarioRepository.findByGestorId(gestorId))
+                .thenReturn(Optional.empty());
+        when(inventarioRepository.save(any(Inventario.class)))
+                .thenReturn(inventarioGuardado);
 
         // ACT
         Inventario resultado = crearInventarioUseCase.ejecutar(inventario);
 
         // ASSERT
         assertNotNull(resultado.getId());
-        assertEquals(50, resultado.getCantidad());
-        assertEquals("Ibuprofeno", resultado.getMedicamento().getNombre());
+        assertEquals(1, resultado.getItems().size());
+        assertEquals(50, resultado.getItems().getFirst().cantidad().valor());
+        assertEquals("Ibuprofeno", resultado.getItems().getFirst().medicamento().getNombre());
         assertEquals("Farmacia Central", resultado.getGestor().getNombre().valor());
-        verify(inventarioRepository, times(1)).save(inventario);
+        verify(inventarioRepository, times(1)).save(any(Inventario.class));
     }
 
     @Test
-    void deberiaSumarCantidadSiInventarioYaExiste() {
+    void deberiaAgregarItemsAlInventarioExistente() {
         // ARRANGE
         UUID medicamentoId = UUID.randomUUID();
         UUID gestorId = UUID.randomUUID();
         UUID inventarioId = UUID.randomUUID();
 
-        Inventario inventarioNuevo = Inventario.builder()
-                .medicamento(Medicamento.builder().id(medicamentoId).build())
-                .gestor(Gestor.builder().id(gestorId).build())
-                .cantidad(30)
-                .precioUnitario(new BigDecimal("12500.00"))
+        // Value Objects
+        Nombre nombreGestor = Nombre.of("Farmacia Central");
+        Cantidad cantidadExistente = Cantidad.of(50);
+        Cantidad cantidadNueva = Cantidad.of(30);
+        Precio precio = Precio.of(BigDecimal.valueOf(12500.00));
+
+        // Crear gestor con estado ACTIVO
+        Gestor gestor = Gestor.builder()
+                .id(gestorId)
+                .nombre(nombreGestor)
+                .estado(EstadoGestor.ACTIVO)  // ← IMPORTANTE
                 .build();
 
+        // Medicamento existente
+        Medicamento medicamento = Medicamento.builder()
+                .id(medicamentoId)
+                .nombre("Ibuprofeno")
+                .build();
+
+        // Inventario existente
+        ItemInventario itemExistente = new ItemInventario(medicamento, cantidadExistente, precio);
         Inventario inventarioExistente = Inventario.builder()
                 .id(inventarioId)
-                .medicamento(Medicamento.builder().id(medicamentoId).build())
-                .gestor(Gestor.builder().id(gestorId).build())
-                .cantidad(50)
-                .precioUnitario(new BigDecimal("12500.00"))
+                .gestor(gestor)
+                .items(new ArrayList<>(List.of(itemExistente)))
                 .build();
 
-        Inventario inventarioActualizado = Inventario.builder()
-                .id(inventarioId)
-                .medicamento(Medicamento.builder().id(medicamentoId).build())
-                .gestor(Gestor.builder().id(gestorId).build())
-                .cantidad(80)
-                .precioUnitario(new BigDecimal("12500.00"))
+        // Nuevo inventario con el item a agregar (mismo medicamento)
+        ItemInventario nuevoItem = new ItemInventario(medicamento, cantidadNueva, precio);
+        Inventario inventarioNuevo = Inventario.builder()
+                .gestor(gestor)
+                .items(List.of(nuevoItem))
                 .build();
 
-        when(inventarioRepository.findByMedicamentoIdAndGestorId(medicamentoId, gestorId))
-                .thenReturn(List.of(inventarioExistente));
-        when(inventarioRepository.save(inventarioExistente)).thenReturn(inventarioActualizado);
+        when(inventarioRepository.findByGestorId(gestorId))
+                .thenReturn(Optional.of(inventarioExistente));
+        when(inventarioRepository.save(inventarioExistente))
+                .thenReturn(inventarioExistente);
 
         // ACT
         Inventario resultado = crearInventarioUseCase.ejecutar(inventarioNuevo);
 
         // ASSERT
-        assertEquals(80, resultado.getCantidad());
+        assertEquals(1, resultado.getItems().size());
+        assertEquals(80, resultado.getItems().getFirst().cantidad().valor()); // 50 + 30 = 80
+        verify(inventarioRepository, times(1)).save(inventarioExistente);
+    }
+
+    @Test
+    void deberiaAgregarNuevoMedicamentoAlInventarioExistente() {
+        // ARRANGE
+        UUID medicamentoId1 = UUID.randomUUID();
+        UUID medicamentoId2 = UUID.randomUUID();
+        UUID gestorId = UUID.randomUUID();
+        UUID inventarioId = UUID.randomUUID();
+
+        // Value Objects
+        Nombre nombreGestor = Nombre.of("Farmacia Central");
+        Cantidad cantidadExistente = Cantidad.of(50);
+        Cantidad cantidadNueva = Cantidad.of(30);
+        Precio precio = Precio.of(BigDecimal.valueOf(12500.00));
+
+        // Crear gestor con estado ACTIVO
+        Gestor gestor = Gestor.builder()
+                .id(gestorId)
+                .nombre(nombreGestor)
+                .estado(EstadoGestor.ACTIVO)  // ← IMPORTANTE
+                .build();
+
+        // Medicamentos
+        Medicamento medicamento1 = Medicamento.builder()
+                .id(medicamentoId1)
+                .nombre("Ibuprofeno")
+                .build();
+        Medicamento medicamento2 = Medicamento.builder()
+                .id(medicamentoId2)
+                .nombre("Paracetamol")
+                .build();
+
+        // Inventario existente con un medicamento
+        ItemInventario itemExistente = new ItemInventario(medicamento1, cantidadExistente, precio);
+        Inventario inventarioExistente = Inventario.builder()
+                .id(inventarioId)
+                .gestor(gestor)
+                .items(new ArrayList<>(List.of(itemExistente)))
+                .build();
+
+        // Nuevo inventario con el nuevo medicamento
+        ItemInventario nuevoItem = new ItemInventario(medicamento2, cantidadNueva, precio);
+        Inventario inventarioNuevo = Inventario.builder()
+                .gestor(gestor)
+                .items(List.of(nuevoItem))
+                .build();
+
+        when(inventarioRepository.findByGestorId(gestorId))
+                .thenReturn(Optional.of(inventarioExistente));
+        when(inventarioRepository.save(inventarioExistente))
+                .thenReturn(inventarioExistente);
+
+        // ACT
+        Inventario resultado = crearInventarioUseCase.ejecutar(inventarioNuevo);
+
+        // ASSERT
+        assertEquals(2, resultado.getItems().size());
+        assertEquals(50, resultado.getItems().get(0).cantidad().valor());
+        assertEquals(30, resultado.getItems().get(1).cantidad().valor());
         verify(inventarioRepository, times(1)).save(inventarioExistente);
     }
 
     @Test
     void deberiaLanzarExcepcionSiCantidadEsNegativa() {
-        // ARRANGE
-        Inventario inventario = Inventario.builder()
-                .medicamento(Medicamento.builder().id(UUID.randomUUID()).build())
-                .gestor(Gestor.builder().id(UUID.randomUUID()).build())
-                .cantidad(-10)
-                .precioUnitario(new BigDecimal("12500.00"))
-                .build();
-
-        // ACT & ASSERT
-        assertThrows(IllegalArgumentException.class,
-                () -> crearInventarioUseCase.ejecutar(inventario));
-        verify(inventarioRepository, never()).save(any());
+        // ARRANGE & ACT & ASSERT
+        assertThrows(BusinessRuleViolationException.class, () -> Cantidad.of(-10));
     }
 
     @Test
     void deberiaLanzarExcepcionSiPrecioEsNegativo() {
-        // ARRANGE
-        Inventario inventario = Inventario.builder()
-                .medicamento(Medicamento.builder().id(UUID.randomUUID()).build())
-                .gestor(Gestor.builder().id(UUID.randomUUID()).build())
-                .cantidad(50)
-                .precioUnitario(new BigDecimal("-100.00"))
-                .build();
-
-        // ACT & ASSERT
-        assertThrows(IllegalArgumentException.class,
-                () -> crearInventarioUseCase.ejecutar(inventario));
-        verify(inventarioRepository, never()).save(any());
+        // ARRANGE & ACT & ASSERT
+        assertThrows(BusinessRuleViolationException.class, () -> Precio.of(BigDecimal.valueOf(-100.00)));
     }
+
+
 }

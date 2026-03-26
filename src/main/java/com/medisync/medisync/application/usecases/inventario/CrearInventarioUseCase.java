@@ -1,9 +1,10 @@
 package com.medisync.medisync.application.usecases.inventario;
 
-import java.util.List;
-
 import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.repositories.IInventarioRepository;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class CrearInventarioUseCase {
 
@@ -14,17 +15,25 @@ public class CrearInventarioUseCase {
     }
 
     public Inventario ejecutar(Inventario inventario) {
-        inventario.validar();
 
-        List<Inventario> existentes = inventarioRepository.findByMedicamentoIdAndGestorId(
-            inventario.getMedicamento().getId(),
-            inventario.getGestor().getId()
-        );
+        UUID gestorId = inventario.getGestor().getId();
 
-        if (!existentes.isEmpty()) {
-        Inventario inventarioExistente = existentes.get(0);
-        inventarioExistente.setCantidad(inventarioExistente.getCantidad() + inventario.getCantidad());
-        return inventarioRepository.save(inventarioExistente);
+        Optional<Inventario> existenteOpt = inventarioRepository.findByGestorId(gestorId);
+
+        if (existenteOpt.isPresent()) {
+
+            Inventario existente = existenteOpt.get();
+
+
+            inventario.getItems().forEach(item ->
+                    existente.agregarMedicamento(
+                            item.medicamento(),
+                            item.cantidad(),
+                            item.precioUnitario()
+                    )
+            );
+
+            return inventarioRepository.save(existente);
         }
 
         return inventarioRepository.save(inventario);
