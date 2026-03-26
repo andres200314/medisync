@@ -27,15 +27,15 @@ public record Cantidad(int valor) {
     }
 
     public Cantidad sumar(int cantidad) {
-        if (cantidad <= 0) {
-            throw new BusinessRuleViolationException("La cantidad a sumar debe ser positiva");
+        if (cantidad < 0) {
+            throw new BusinessRuleViolationException("La cantidad a sumar debe ser positiva o cero");
         }
         return new Cantidad(this.valor + cantidad);
     }
 
     public Cantidad restar(int cantidad) {
-        if (cantidad <= 0) {
-            throw new BusinessRuleViolationException("La cantidad a restar debe ser positiva");
+        if (cantidad < 0) {
+            throw new BusinessRuleViolationException("La cantidad a restar debe ser positiva o cero");
         }
         if (this.valor < cantidad) {
             throw new BusinessRuleViolationException("No hay suficiente stock. Stock actual: " + this.valor + ", solicitado: " + cantidad);

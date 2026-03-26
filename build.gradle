@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.11'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.medisync'
@@ -23,7 +24,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -38,4 +38,50 @@ dependencies {
 test {
 	useJUnitPlatform()
 	jvmArgs '-XX:+EnableDynamicAgentLoading'
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+	toolVersion = "0.8.13"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					// Clase principal
+					'**/MedisyncApplication.class',
+
+					// Configuración
+					'**/infrastructure/config/**',
+
+					// DTOs
+					'**/adapters/in/web/dto/**',
+					'**/application/dto/**',
+
+					// Entidades JPA
+					'**/adapters/out/persistence/entities/**',
+
+					// Mappers (tanto de entrada como de salida)
+					'**/adapters/in/web/mappers/**',
+					'**/adapters/out/persistence/mappers/**',
+
+					// Excepciones de dominio (NotFoundException)
+					'**/domain/exceptions/*NotFoundException.class',
+					'**/adapters/in/web/exceptions/*NotFoundException.class',
+
+					// Enums
+					'**/domain/enums/**',
+
+					// Clases de utilidad
+					'**/shared/**'
+			])
+		}))
+	}
 }

@@ -13,4 +13,8 @@ public record Nit(String valor) {
             throw new BusinessRuleViolationException("El NIT no tiene un formato válido: " + valor);
         }
     }
+
+    public static Nit of(String valor) {
+        return new Nit(valor);
+    }
 }

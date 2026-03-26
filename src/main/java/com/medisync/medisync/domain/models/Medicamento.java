@@ -1,6 +1,5 @@
 package com.medisync.medisync.domain.models;
 
-
 import java.util.UUID;
 
 import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
@@ -10,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -22,6 +20,15 @@ public class Medicamento {
     private String nombre;
     private Boolean requiereFormula;
     private String descripcion;
+
+
+    public Medicamento(String nombre, Boolean requiereFormula, String descripcion) {
+        this.nombre = nombre;
+        this.requiereFormula = requiereFormula;
+        this.descripcion = descripcion;
+        validar();
+        normalizarNombre();
+    }
 
     public void validar() {
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -44,7 +51,7 @@ public class Medicamento {
     public void normalizarNombre() {
         if (nombre != null && !nombre.trim().isEmpty()) {
             this.nombre = nombre.trim().substring(0, 1).toUpperCase()
-                     + nombre.trim().substring(1).toLowerCase();
+                    + nombre.trim().substring(1).toLowerCase();
         }
     }
 }

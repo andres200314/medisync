@@ -1,5 +1,7 @@
 package com.medisync.medisync.application.usecases.gestor;
+import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
 import com.medisync.medisync.domain.models.Gestor;
+import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.services.IPasswordEncoder;
 
@@ -7,14 +9,26 @@ public class CrearGestorUseCase {
 
     private final IGestorRepository gestorRepository;
     private final IPasswordEncoder passwordEncoder;
+    private final CrearInventarioUseCase crearInventarioUseCase;
 
-    public CrearGestorUseCase(IGestorRepository gestorRepository, IPasswordEncoder passwordEncoder) {
+    public CrearGestorUseCase(IGestorRepository gestorRepository, IPasswordEncoder passwordEncoder, CrearInventarioUseCase crearInventarioUseCase) {
         this.gestorRepository = gestorRepository;
         this.passwordEncoder = passwordEncoder;
+        this.crearInventarioUseCase = crearInventarioUseCase;
     }
 
     public Gestor ejecutar(Gestor gestor) {
+
         gestor.setPasswordHash(passwordEncoder.encode(gestor.getPasswordHash()));
-        return gestorRepository.save(gestor);
+
+        Gestor gestorGuardado = gestorRepository.save(gestor);
+
+        Inventario inventario = Inventario.builder()
+                .gestor(gestorGuardado)
+                .build();
+
+        crearInventarioUseCase.ejecutar(inventario);
+
+        return gestorGuardado;
     }
 }

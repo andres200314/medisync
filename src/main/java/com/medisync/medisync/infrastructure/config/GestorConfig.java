@@ -1,6 +1,7 @@
 package com.medisync.medisync.infrastructure.config;
 
 import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
+import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
 import com.medisync.medisync.domain.services.IPasswordEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +16,8 @@ public class GestorConfig {
 
     @Bean
     public CrearGestorUseCase crearGestorUseCase(IGestorRepository gestorRepository,
-                                                  IPasswordEncoder passwordEncoder) {
-        return new CrearGestorUseCase(gestorRepository, passwordEncoder);
+                                                 IPasswordEncoder passwordEncoder, CrearInventarioUseCase crearInventarioUseCase) {
+        return new CrearGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
     }
 
     @Bean

@@ -3,26 +3,20 @@ package com.medisync.medisync.application.usecases.gestor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.services.IPasswordEncoder;
-import com.medisync.medisync.domain.valueobjects.Coordenadas;
-import com.medisync.medisync.domain.valueobjects.Email;
-import com.medisync.medisync.domain.valueobjects.Nit;
-import com.medisync.medisync.domain.valueobjects.Nombre;
-import com.medisync.medisync.domain.valueobjects.Telefono;
+import com.medisync.medisync.domain.valueobjects.*;
 
 @ExtendWith(MockitoExtension.class)
 class CrearGestorUseCaseTest {
@@ -33,12 +27,14 @@ class CrearGestorUseCaseTest {
     @Mock
     private IPasswordEncoder passwordEncoder;
 
+    @Mock
+    private CrearInventarioUseCase crearInventarioUseCase; // 🔥 nuevo
+
     @InjectMocks
     private CrearGestorUseCase crearGestorUseCase;
 
     @Test
     void deberiaCrearGestorExitosamente() {
-        // ARRANGE
         Gestor gestor = Gestor.builder()
                 .nombre(new Nombre("Farmacia Central"))
                 .nit(new Nit("900123456-1"))
@@ -63,20 +59,21 @@ class CrearGestorUseCaseTest {
         when(passwordEncoder.encode("password123")).thenReturn("$2a$10$hasheado");
         when(gestorRepository.save(gestor)).thenReturn(gestorGuardado);
 
-        // ACT
         Gestor resultado = crearGestorUseCase.ejecutar(gestor);
 
-        // ASSERT
         assertNotNull(resultado.getId());
         assertEquals("Farmacia Central", resultado.getNombre().valor());
         assertEquals("$2a$10$hasheado", resultado.getPasswordHash());
-        verify(passwordEncoder, times(1)).encode("password123");
-        verify(gestorRepository, times(1)).save(gestor);
+
+        verify(passwordEncoder).encode("password123");
+        verify(gestorRepository).save(gestor);
+
+        // 🔥 nuevo: verificar que se creó inventario
+        verify(crearInventarioUseCase).ejecutar(any());
     }
 
     @Test
     void deberiaHashearPasswordAntesDeGuardar() {
-        // ARRANGE
         Gestor gestor = Gestor.builder()
                 .nombre(new Nombre("Droguería San José"))
                 .nit(new Nit("800987654-2"))
@@ -90,18 +87,17 @@ class CrearGestorUseCaseTest {
         when(passwordEncoder.encode("miPassword")).thenReturn("$2a$10$otroHash");
         when(gestorRepository.save(gestor)).thenReturn(gestor);
 
-        // ACT
         crearGestorUseCase.ejecutar(gestor);
 
-        // ASSERT
         assertEquals("$2a$10$otroHash", gestor.getPasswordHash());
-        verify(passwordEncoder, times(1)).encode("miPassword");
-        verify(gestorRepository, times(1)).save(gestor);
+
+        verify(passwordEncoder).encode("miPassword");
+        verify(gestorRepository).save(gestor);
+        verify(crearInventarioUseCase).ejecutar(any()); // 🔥 importante
     }
 
     @Test
     void deberiaMantenerPropiedadesCorrectamente() {
-        // ARRANGE
         Gestor gestor = Gestor.builder()
                 .nombre(new Nombre("Droguería San José"))
                 .nit(new Nit("800987654-2"))
@@ -115,10 +111,8 @@ class CrearGestorUseCaseTest {
         when(passwordEncoder.encode(any())).thenReturn("$2a$10$otroHash");
         when(gestorRepository.save(gestor)).thenReturn(gestor);
 
-        // ACT
         Gestor resultado = crearGestorUseCase.ejecutar(gestor);
 
-        // ASSERT
         assertEquals("Droguería San José", resultado.getNombre().valor());
         assertEquals("800987654-2", resultado.getNit().valor());
         assertEquals("Carrera 5 #15-20", resultado.getDireccion());
@@ -126,5 +120,7 @@ class CrearGestorUseCaseTest {
         assertEquals("drogueria@sanjose.com", resultado.getEmail().valor());
         assertEquals(new BigDecimal("6.2530"), resultado.getCoordenadas().latitud());
         assertEquals(new BigDecimal("-75.5743"), resultado.getCoordenadas().longitud());
+
+        verify(crearInventarioUseCase).ejecutar(any()); // 🔥 importante
     }
 }
