@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,4 +45,12 @@ public class MedicamentoRepositoryImpl implements IMedicamentoRepository {
                 .map(entityMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Medicamento> findByNombreContainingIgnoreCase(String nombre) {
+        return jpaRepository.findByNombreContainingIgnoreCase(nombre).stream()
+                .map(entityMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
 }
