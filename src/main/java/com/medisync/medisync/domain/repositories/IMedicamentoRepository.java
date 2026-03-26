@@ -12,4 +12,5 @@ public interface IMedicamentoRepository {
     void deleteById(UUID id);
     Optional<Medicamento> findById(UUID id);
     List<Medicamento> findAll();
+    List<Medicamento> findByNombreContainingIgnoreCase(String nombre);
 }
