@@ -7,6 +7,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.medisync.medisync.domain.valueobjects.Nombre;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +50,7 @@ class CrearInventarioUseCaseTest {
         Inventario inventarioGuardado = Inventario.builder()
                 .id(UUID.randomUUID())
                 .medicamento(Medicamento.builder().id(medicamentoId).nombre("Ibuprofeno").build())
-                .gestor(Gestor.builder().id(gestorId).nombre("Farmacia Central").build())
+                .gestor(Gestor.builder().id(gestorId).nombre(new Nombre("Farmacia Central")).build())
                 .cantidad(50)
                 .precioUnitario(new BigDecimal("12500.00"))
                 .build();
@@ -64,7 +66,7 @@ class CrearInventarioUseCaseTest {
         assertNotNull(resultado.getId());
         assertEquals(50, resultado.getCantidad());
         assertEquals("Ibuprofeno", resultado.getMedicamento().getNombre());
-        assertEquals("Farmacia Central", resultado.getGestor().getNombre());
+        assertEquals("Farmacia Central", resultado.getGestor().getNombre().valor());
         verify(inventarioRepository, times(1)).save(inventario);
     }
 

@@ -7,6 +7,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.medisync.medisync.domain.valueobjects.Nombre;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,14 +39,14 @@ class ObtenerInventariosUseCaseTest {
                 Inventario.builder()
                         .id(UUID.randomUUID())
                         .medicamento(Medicamento.builder().id(UUID.randomUUID()).nombre("Ibuprofeno").build())
-                        .gestor(Gestor.builder().id(UUID.randomUUID()).nombre("Farmacia Central").build())
+                        .gestor(Gestor.builder().id(UUID.randomUUID()).nombre(new Nombre("Farmacia Central")).build())
                         .cantidad(50)
                         .precioUnitario(new BigDecimal("12500.00"))
                         .build(),
                 Inventario.builder()
                         .id(UUID.randomUUID())
                         .medicamento(Medicamento.builder().id(UUID.randomUUID()).nombre("Amoxicilina").build())
-                        .gestor(Gestor.builder().id(UUID.randomUUID()).nombre("Droguería San José").build())
+                        .gestor(Gestor.builder().id(UUID.randomUUID()).nombre(new Nombre("Droguería San José")).build())
                         .cantidad(30)
                         .precioUnitario(new BigDecimal("8500.00"))
                         .build()
@@ -59,7 +61,7 @@ class ObtenerInventariosUseCaseTest {
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals("Ibuprofeno", resultado.get(0).getMedicamento().getNombre());
-        assertEquals("Droguería San José", resultado.get(1).getGestor().getNombre());
+        assertEquals("Droguería San José", resultado.get(1).getGestor().getNombre().valor());
         verify(inventarioRepository, times(1)).findAll();
     }
 
@@ -84,7 +86,7 @@ class ObtenerInventariosUseCaseTest {
         Inventario inventario = Inventario.builder()
                 .id(id)
                 .medicamento(Medicamento.builder().id(UUID.randomUUID()).nombre("Ibuprofeno").build())
-                .gestor(Gestor.builder().id(UUID.randomUUID()).nombre("Farmacia Central").build())
+                .gestor(Gestor.builder().id(UUID.randomUUID()).nombre(new Nombre("Farmacia Central")).build())
                 .cantidad(50)
                 .precioUnitario(new BigDecimal("12500.00"))
                 .build();
@@ -95,10 +97,10 @@ class ObtenerInventariosUseCaseTest {
         List<Inventario> resultado = obtenerInventariosUseCase.ejecutar();
 
         // ASSERT
-        assertEquals(id, resultado.get(0).getId());
-        assertEquals(50, resultado.get(0).getCantidad());
-        assertEquals(new BigDecimal("12500.00"), resultado.get(0).getPrecioUnitario());
-        assertEquals("Ibuprofeno", resultado.get(0).getMedicamento().getNombre());
-        assertEquals("Farmacia Central", resultado.get(0).getGestor().getNombre());
+        assertEquals(id, resultado.getFirst().getId());
+        assertEquals(50, resultado.getFirst().getCantidad());
+        assertEquals(new BigDecimal("12500.00"), resultado.getFirst().getPrecioUnitario());
+        assertEquals("Ibuprofeno", resultado.getFirst().getMedicamento().getNombre());
+        assertEquals("Farmacia Central", resultado.getFirst().getGestor().getNombre().valor());
     }
 }
