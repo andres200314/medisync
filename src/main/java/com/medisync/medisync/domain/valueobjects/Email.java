@@ -13,4 +13,8 @@ public record Email(String valor) {
         }
         this.valor = valor.toLowerCase();
     }
+
+    public static Email of(String valor) {
+        return new Email(valor);
+    }
 }

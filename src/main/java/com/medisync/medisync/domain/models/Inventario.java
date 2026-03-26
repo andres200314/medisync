@@ -9,6 +9,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -26,16 +27,21 @@ public class Inventario {
     public void agregarMedicamento(Medicamento medicamento, Cantidad cantidad, Precio precio) {
 
         validarGestorActivo();
-
-        if (medicamento == null) {
-            throw new BusinessRuleViolationException("El medicamento no puede ser nulo");
-        }
+        validarMedicamento(medicamento);
 
         ItemInventario existente = buscarItem(medicamento);
 
         if (existente != null) {
+
+            if (!existente.precioUnitario().equals(precio)) {
+                throw new BusinessRuleViolationException(
+                        "No se puede agregar el mismo medicamento con diferente precio."
+                );
+            }
+
             ItemInventario actualizado = existente.aumentarStock(cantidad.valor());
             actualizarItem(existente, actualizado);
+
         } else {
             items.add(new ItemInventario(medicamento, cantidad, precio));
         }
@@ -44,11 +50,16 @@ public class Inventario {
     public void reducirStock(Medicamento medicamento, int cantidad) {
 
         validarGestorActivo();
+        validarMedicamento(medicamento);
 
         ItemInventario existente = buscarItem(medicamento);
 
         if (existente == null) {
             throw new BusinessRuleViolationException("El medicamento no existe en el inventario");
+        }
+
+        if (existente.cantidad().valor() < cantidad) {
+            throw new BusinessRuleViolationException("No hay suficiente stock para reducir");
         }
 
         ItemInventario actualizado = existente.reducirStock(cantidad);
@@ -58,6 +69,7 @@ public class Inventario {
     public void cambiarPrecio(Medicamento medicamento, Precio nuevoPrecio) {
 
         validarGestorActivo();
+        validarMedicamento(medicamento);
 
         ItemInventario existente = buscarItem(medicamento);
 
@@ -69,9 +81,8 @@ public class Inventario {
         actualizarItem(existente, actualizado);
     }
 
-
-
     public boolean tieneStock(Medicamento medicamento) {
+        validarMedicamento(medicamento);
         ItemInventario existente = buscarItem(medicamento);
         return existente != null && existente.tieneStock();
     }
@@ -79,8 +90,6 @@ public class Inventario {
     public boolean estaDisponibleParaUsuarios() {
         return gestor.esVisibleParaUsuarios() && tieneAlMenosUnItemConStock();
     }
-
-
 
     private void validarGestorActivo() {
         if (gestor == null) {
@@ -92,22 +101,22 @@ public class Inventario {
         }
     }
 
+    private void validarMedicamento(Medicamento medicamento) {
+        if (medicamento == null) {
+            throw new BusinessRuleViolationException("El medicamento no puede ser nulo");
+        }
+    }
 
-
-
-    private ItemInventario buscarItem(Medicamento medicamento) {
-
+    public ItemInventario buscarItem(Medicamento medicamento) {
         for (ItemInventario item : items) {
             if (item.esDelMismoMedicamento(medicamento)) {
                 return item;
             }
         }
-
         return null;
     }
 
     private void actualizarItem(ItemInventario original, ItemInventario actualizado) {
-
         int index = items.indexOf(original);
 
         if (index == -1) {
@@ -118,13 +127,17 @@ public class Inventario {
     }
 
     private boolean tieneAlMenosUnItemConStock() {
-
         for (ItemInventario item : items) {
             if (item.tieneStock()) {
                 return true;
             }
         }
-
         return false;
+    }
+
+    public List<ItemInventario> obtenerItemsConStock() {
+        return items.stream()
+                .filter(ItemInventario::tieneStock)
+                .collect(Collectors.toList());
     }
 }

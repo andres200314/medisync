@@ -1,5 +1,6 @@
 package com.medisync.medisync.domain.valueobjects;
 
+import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
 import com.medisync.medisync.domain.models.Medicamento;
 
 public record ItemInventario(
@@ -10,13 +11,13 @@ public record ItemInventario(
 
     public ItemInventario {
         if (medicamento == null) {
-            throw new IllegalArgumentException("El medicamento no puede ser nulo");
+            throw new BusinessRuleViolationException("El medicamento no puede ser nulo");
         }
         if (cantidad == null) {
-            throw new IllegalArgumentException("La cantidad no puede ser nula");
+            throw new BusinessRuleViolationException("La cantidad no puede ser nula");
         }
         if (precioUnitario == null) {
-            throw new IllegalArgumentException("El precio no puede ser nulo");
+            throw new BusinessRuleViolationException("El precio no puede ser nulo");
         }
     }
 
