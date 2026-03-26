@@ -1,4 +1,4 @@
-package com.medisync.medisync.domain.exceptions;
+package com.medisync.medisync.adapters.in.web.exceptions;
 
 public class MedicamentoNotFoundException extends RuntimeException {
     public MedicamentoNotFoundException(String id) {

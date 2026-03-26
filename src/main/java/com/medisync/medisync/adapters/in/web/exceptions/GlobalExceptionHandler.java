@@ -1,7 +1,8 @@
-package com.medisync.medisync.domain.exceptions;
+package com.medisync.medisync.adapters.in.web.exceptions;
 
 import java.util.Map;
 
+import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +45,16 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "Ya existe un registro con ese valor único"));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", ex.getMessage()));
+    }
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    public ResponseEntity<Map<String, String>> handleBusinessRuleViolation(BusinessRuleViolationException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("error", ex.getMessage()));
     }
 }

@@ -6,7 +6,10 @@ import java.util.UUID;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.valueobjects.Email;
+import com.medisync.medisync.domain.valueobjects.Nit;
+import com.medisync.medisync.domain.valueobjects.Nombre;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,9 +36,9 @@ class ObtenerGestorPorIdUseCaseTest {
         UUID id = UUID.randomUUID();
         Gestor gestor = Gestor.builder()
                 .id(id)
-                .nombre("Farmacia Central")
-                .nit("9001234666-7")
-                .email("farmacia@gmail.com")
+                .nombre(new Nombre("Farmacia Central"))
+                .nit(new Nit("9001234666-7"))
+                .email(new Email("farmacia@gmail.com"))
                 .passwordHash("hashedPassword")
                 .build();
 
@@ -47,7 +50,7 @@ class ObtenerGestorPorIdUseCaseTest {
         // ASSERT
         assertNotNull(resultado);
         assertEquals(id, resultado.getId());
-        assertEquals("Farmacia Central", resultado.getNombre());
+        assertEquals("Farmacia Central", resultado.getNombre().valor());
         verify(gestorRepository, times(1)).findById(id);
     }
 

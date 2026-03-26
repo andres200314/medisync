@@ -28,7 +28,7 @@ public class GestorController {
 
     @PostMapping
     public ResponseEntity<GestorResponseDTO> crear(@RequestBody GestorRequestDTO request) {
-        Gestor creado = crearGestorUseCase.ejecutar(mapper.toEntity(request));
+        Gestor creado = crearGestorUseCase.ejecutar(mapper.toDomain(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
     }
 

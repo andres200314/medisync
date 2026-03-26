@@ -26,7 +26,7 @@ public class InventarioMapper {
                 .medicamentoId(inventario.getMedicamento().getId())
                 .medicamentoNombre(inventario.getMedicamento().getNombre())
                 .gestorId(inventario.getGestor().getId())
-                .gestorNombre(inventario.getGestor().getNombre())
+                .gestorNombre(inventario.getGestor().getNombre().valor())
                 .cantidad(inventario.getCantidad())
                 .precioUnitario(inventario.getPrecioUnitario())
                 .build();

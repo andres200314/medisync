@@ -14,10 +14,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
+import com.medisync.medisync.domain.services.IPasswordEncoder;
+import com.medisync.medisync.domain.valueobjects.Coordenadas;
+import com.medisync.medisync.domain.valueobjects.Email;
+import com.medisync.medisync.domain.valueobjects.Nit;
+import com.medisync.medisync.domain.valueobjects.Nombre;
+import com.medisync.medisync.domain.valueobjects.Telefono;
 
 @ExtendWith(MockitoExtension.class)
 class CrearGestorUseCaseTest {
@@ -26,7 +31,7 @@ class CrearGestorUseCaseTest {
     private IGestorRepository gestorRepository;
 
     @Mock
-    private BCryptPasswordEncoder passwordEncoder;
+    private IPasswordEncoder passwordEncoder;
 
     @InjectMocks
     private CrearGestorUseCase crearGestorUseCase;
@@ -35,26 +40,24 @@ class CrearGestorUseCaseTest {
     void deberiaCrearGestorExitosamente() {
         // ARRANGE
         Gestor gestor = Gestor.builder()
-                .nombre("Farmacia Central")
-                .nit("900123456-1")
+                .nombre(new Nombre("Farmacia Central"))
+                .nit(new Nit("900123456-1"))
                 .direccion("Calle 10 #20-30")
-                .telefono("3001234567")
-                .email("farmacia@central.com")
+                .telefono(new Telefono("3001234567"))
+                .email(new Email("farmacia@central.com"))
                 .passwordHash("password123")
-                .latitud(new BigDecimal("6.2442"))
-                .longitud(new BigDecimal("-75.5812"))
+                .coordenadas(new Coordenadas(new BigDecimal("6.2442"), new BigDecimal("-75.5812")))
                 .build();
 
         Gestor gestorGuardado = Gestor.builder()
                 .id(UUID.randomUUID())
-                .nombre("Farmacia Central")
-                .nit("900123456-1")
+                .nombre(new Nombre("Farmacia Central"))
+                .nit(new Nit("900123456-1"))
                 .direccion("Calle 10 #20-30")
-                .telefono("3001234567")
-                .email("farmacia@central.com")
+                .telefono(new Telefono("3001234567"))
+                .email(new Email("farmacia@central.com"))
                 .passwordHash("$2a$10$hasheado")
-                .latitud(new BigDecimal("6.2442"))
-                .longitud(new BigDecimal("-75.5812"))
+                .coordenadas(new Coordenadas(new BigDecimal("6.2442"), new BigDecimal("-75.5812")))
                 .build();
 
         when(passwordEncoder.encode("password123")).thenReturn("$2a$10$hasheado");
@@ -65,7 +68,7 @@ class CrearGestorUseCaseTest {
 
         // ASSERT
         assertNotNull(resultado.getId());
-        assertEquals("Farmacia Central", resultado.getNombre());
+        assertEquals("Farmacia Central", resultado.getNombre().valor());
         assertEquals("$2a$10$hasheado", resultado.getPasswordHash());
         verify(passwordEncoder, times(1)).encode("password123");
         verify(gestorRepository, times(1)).save(gestor);
@@ -75,14 +78,13 @@ class CrearGestorUseCaseTest {
     void deberiaHashearPasswordAntesDeGuardar() {
         // ARRANGE
         Gestor gestor = Gestor.builder()
-                .nombre("Droguería San José")
-                .nit("800987654-2")
+                .nombre(new Nombre("Droguería San José"))
+                .nit(new Nit("800987654-2"))
                 .direccion("Carrera 5 #15-20")
-                .telefono("3109876543")
-                .email("drogueria@sanjose.com")
+                .telefono(new Telefono("3109876543"))
+                .email(new Email("drogueria@sanjose.com"))
                 .passwordHash("miPassword")
-                .latitud(new BigDecimal("6.2530"))
-                .longitud(new BigDecimal("-75.5743"))
+                .coordenadas(new Coordenadas(new BigDecimal("6.2530"), new BigDecimal("-75.5743")))
                 .build();
 
         when(passwordEncoder.encode("miPassword")).thenReturn("$2a$10$otroHash");
@@ -101,14 +103,13 @@ class CrearGestorUseCaseTest {
     void deberiaMantenerPropiedadesCorrectamente() {
         // ARRANGE
         Gestor gestor = Gestor.builder()
-                .nombre("Droguería San José")
-                .nit("800987654-2")
+                .nombre(new Nombre("Droguería San José"))
+                .nit(new Nit("800987654-2"))
                 .direccion("Carrera 5 #15-20")
-                .telefono("3109876543")
-                .email("drogueria@sanjose.com")
+                .telefono(new Telefono("3109876543"))
+                .email(new Email("drogueria@sanjose.com"))
                 .passwordHash("miPassword")
-                .latitud(new BigDecimal("6.2530"))
-                .longitud(new BigDecimal("-75.5743"))
+                .coordenadas(new Coordenadas(new BigDecimal("6.2530"), new BigDecimal("-75.5743")))
                 .build();
 
         when(passwordEncoder.encode(any())).thenReturn("$2a$10$otroHash");
@@ -118,12 +119,12 @@ class CrearGestorUseCaseTest {
         Gestor resultado = crearGestorUseCase.ejecutar(gestor);
 
         // ASSERT
-        assertEquals("Droguería San José", resultado.getNombre());
-        assertEquals("800987654-2", resultado.getNit());
+        assertEquals("Droguería San José", resultado.getNombre().valor());
+        assertEquals("800987654-2", resultado.getNit().valor());
         assertEquals("Carrera 5 #15-20", resultado.getDireccion());
-        assertEquals("3109876543", resultado.getTelefono());
-        assertEquals("drogueria@sanjose.com", resultado.getEmail());
-        assertEquals(new BigDecimal("6.2530"), resultado.getLatitud());
-        assertEquals(new BigDecimal("-75.5743"), resultado.getLongitud());
+        assertEquals("3109876543", resultado.getTelefono().valor());
+        assertEquals("drogueria@sanjose.com", resultado.getEmail().valor());
+        assertEquals(new BigDecimal("6.2530"), resultado.getCoordenadas().latitud());
+        assertEquals(new BigDecimal("-75.5743"), resultado.getCoordenadas().longitud());
     }
 }
