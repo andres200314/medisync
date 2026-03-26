@@ -1,5 +1,6 @@
 package com.medisync.medisync.adapters.out.persistence.mappers;
 
+import com.medisync.medisync.domain.valueobjects.*;
 import org.springframework.stereotype.Component;
 
 import com.medisync.medisync.adapters.out.persistence.entities.GestorEntity;
@@ -12,28 +13,27 @@ public class GestorEntityMapper {
     public Gestor toDomain(GestorEntity entity) {
         return Gestor.builder()
                 .id(entity.getId())
-                .nombre(entity.getNombre())
-                .nit(entity.getNit())
+                .nombre(new Nombre(entity.getNombre()))
+                .nit(new Nit(entity.getNit()))
                 .direccion(entity.getDireccion())
-                .telefono(entity.getTelefono())
-                .email(entity.getEmail())
+                .telefono(new Telefono(entity.getTelefono()))
+                .email(new Email(entity.getEmail()))
                 .passwordHash(entity.getPasswordHash())
-                .latitud(entity.getLatitud())
-                .longitud(entity.getLongitud())
+                .coordenadas(new Coordenadas(entity.getLatitud(), entity.getLongitud()))
                 .build();
     }
 
     public GestorEntity toEntity(Gestor gestor) {
         return GestorEntity.builder()
                 .id(gestor.getId())
-                .nombre(gestor.getNombre())
-                .nit(gestor.getNit())
+                .nombre(gestor.getNombre().valor())
+                .nit(gestor.getNit().valor())
                 .direccion(gestor.getDireccion())
-                .telefono(gestor.getTelefono())
-                .email(gestor.getEmail())
+                .telefono(gestor.getTelefono().valor())
+                .email(gestor.getEmail().valor())
                 .passwordHash(gestor.getPasswordHash())
-                .latitud(gestor.getLatitud())
-                .longitud(gestor.getLongitud())
+                .latitud(gestor.getCoordenadas().latitud())
+                .longitud(gestor.getCoordenadas().longitud())
                 .build();
     }
 }

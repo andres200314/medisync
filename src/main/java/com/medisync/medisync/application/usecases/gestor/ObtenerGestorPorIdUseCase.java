@@ -2,7 +2,7 @@ package com.medisync.medisync.application.usecases.gestor;
 
 
 import com.medisync.medisync.domain.models.Gestor;
-import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 
 import java.util.UUID;

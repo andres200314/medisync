@@ -1,16 +1,14 @@
 package com.medisync.medisync.application.usecases.gestor;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
+import com.medisync.medisync.domain.services.IPasswordEncoder;
 
 public class CrearGestorUseCase {
 
     private final IGestorRepository gestorRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final IPasswordEncoder passwordEncoder;
 
-    public CrearGestorUseCase(IGestorRepository gestorRepository, BCryptPasswordEncoder passwordEncoder) {
+    public CrearGestorUseCase(IGestorRepository gestorRepository, IPasswordEncoder passwordEncoder) {
         this.gestorRepository = gestorRepository;
         this.passwordEncoder = passwordEncoder;
     }
