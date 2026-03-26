@@ -14,6 +14,8 @@ public class CrearMedicamentoUseCase {
     }
 
     public Medicamento ejecutar(Medicamento medicamento) {
+        medicamento.normalizarNombre();
+        medicamento.validar();
         return medicamentoRepository.save(medicamento);
     }
 }
