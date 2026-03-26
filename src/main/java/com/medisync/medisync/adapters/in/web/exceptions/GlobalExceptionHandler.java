@@ -2,13 +2,14 @@ package com.medisync.medisync.adapters.in.web.exceptions;
 
 import java.util.Map;
 
-import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -57,4 +58,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(Map.of("error", ex.getMessage()));
     }
+
+   
 }
