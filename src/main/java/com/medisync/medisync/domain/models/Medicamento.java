@@ -42,9 +42,9 @@ public class Medicamento {
     }
 
     public void normalizarNombre() {
-    if (nombre != null) {
-        this.nombre = nombre.trim().substring(0, 1).toUpperCase() 
-                    + nombre.trim().substring(1).toLowerCase();
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            this.nombre = nombre.trim().substring(0, 1).toUpperCase()
+                     + nombre.trim().substring(1).toLowerCase();
+        }
     }
-}
 }
