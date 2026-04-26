@@ -24,3 +24,8 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  security:
+    secret: ${JWT_SECRET:medisync-clave-secreta-super-larga-de-al-menos-256-bits-para-hmac-sha}
+    expiration: ${JWT_EXPIRATION:86400000}
