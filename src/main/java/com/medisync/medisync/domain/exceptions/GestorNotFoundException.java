@@ -1,4 +1,4 @@
-package com.medisync.medisync.adapters.in.web.exceptions;
+package com.medisync.medisync.domain.exceptions;
 
 public class GestorNotFoundException extends RuntimeException {
     public GestorNotFoundException(String id) {

@@ -1,22 +1,21 @@
 package com.medisync.medisync.application.usecases.gestor;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
 import com.medisync.medisync.domain.models.Gestor;
+import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.services.IPasswordEncoder;
-import com.medisync.medisync.domain.valueobjects.*;
 
 @ExtendWith(MockitoExtension.class)
 class CrearGestorUseCaseTest {
@@ -28,99 +27,60 @@ class CrearGestorUseCaseTest {
     private IPasswordEncoder passwordEncoder;
 
     @Mock
-    private CrearInventarioUseCase crearInventarioUseCase; // 🔥 nuevo
+    private CrearInventarioUseCase crearInventarioUseCase;
 
-    @InjectMocks
     private CrearGestorUseCase crearGestorUseCase;
+
+    private static final String NOMBRE = "Farmacia Central";
+    private static final String NIT = "900123456-1";
+    private static final String DIRECCION = "Calle 10 #20-30";
+    private static final String TELEFONO = "3001234567";
+    private static final String EMAIL = "farmacia@central.com";
+    private static final String PASSWORD = "password123";
+    private static final String HASHED_PASSWORD = "$2a$10$hasheado";
+    private static final double LATITUD = 6.2442;
+    private static final double LONGITUD = -75.5812;
+
+    @BeforeEach
+    void setUp() {
+        crearGestorUseCase = new CrearGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
+    }
 
     @Test
     void deberiaCrearGestorExitosamente() {
-        Gestor gestor = Gestor.builder()
-                .nombre(new Nombre("Farmacia Central"))
-                .nit(new Nit("900123456-1"))
-                .direccion("Calle 10 #20-30")
-                .telefono(new Telefono("3001234567"))
-                .email(new Email("farmacia@central.com"))
-                .passwordHash("password123")
-                .coordenadas(new Coordenadas(new BigDecimal("6.2442"), new BigDecimal("-75.5812")))
-                .build();
+        // Given
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(HASHED_PASSWORD);
 
-        Gestor gestorGuardado = Gestor.builder()
+        Gestor gestorEsperado = Gestor.crear(NOMBRE, NIT, DIRECCION, TELEFONO, EMAIL, HASHED_PASSWORD, LATITUD, LONGITUD);
+        Gestor gestorConId = Gestor.builder()
                 .id(UUID.randomUUID())
-                .nombre(new Nombre("Farmacia Central"))
-                .nit(new Nit("900123456-1"))
-                .direccion("Calle 10 #20-30")
-                .telefono(new Telefono("3001234567"))
-                .email(new Email("farmacia@central.com"))
-                .passwordHash("$2a$10$hasheado")
-                .coordenadas(new Coordenadas(new BigDecimal("6.2442"), new BigDecimal("-75.5812")))
+                .nombre(gestorEsperado.getNombre())
+                .nit(gestorEsperado.getNit())
+                .direccion(gestorEsperado.getDireccion())
+                .telefono(gestorEsperado.getTelefono())
+                .email(gestorEsperado.getEmail())
+                .passwordHash(gestorEsperado.getPasswordHash())
+                .coordenadas(gestorEsperado.getCoordenadas())
+                .estado(gestorEsperado.getEstado())
                 .build();
 
-        when(passwordEncoder.encode("password123")).thenReturn("$2a$10$hasheado");
-        when(gestorRepository.save(gestor)).thenReturn(gestorGuardado);
+        when(gestorRepository.save(any(Gestor.class))).thenReturn(gestorConId);
+        when(crearInventarioUseCase.ejecutar(any(Inventario.class))).thenAnswer(i -> i.getArgument(0));
 
-        Gestor resultado = crearGestorUseCase.ejecutar(gestor);
+        // When
+        Gestor resultado = crearGestorUseCase.ejecutar(NOMBRE, NIT, DIRECCION, TELEFONO, EMAIL, PASSWORD, LATITUD, LONGITUD);
 
+        // Then
         assertNotNull(resultado.getId());
-        assertEquals("Farmacia Central", resultado.getNombre().valor());
-        assertEquals("$2a$10$hasheado", resultado.getPasswordHash());
+        assertEquals(NOMBRE, resultado.getNombre().valor());
+        assertEquals(NIT, resultado.getNit().valor());
+        assertEquals(DIRECCION, resultado.getDireccion());
+        assertEquals(TELEFONO, resultado.getTelefono().valor());
+        assertEquals(EMAIL, resultado.getEmail().valor());
+        assertEquals(HASHED_PASSWORD, resultado.getPasswordHash());
 
-        verify(passwordEncoder).encode("password123");
-        verify(gestorRepository).save(gestor);
-
-        // 🔥 nuevo: verificar que se creó inventario
-        verify(crearInventarioUseCase).ejecutar(any());
-    }
-
-    @Test
-    void deberiaHashearPasswordAntesDeGuardar() {
-        Gestor gestor = Gestor.builder()
-                .nombre(new Nombre("Droguería San José"))
-                .nit(new Nit("800987654-2"))
-                .direccion("Carrera 5 #15-20")
-                .telefono(new Telefono("3109876543"))
-                .email(new Email("drogueria@sanjose.com"))
-                .passwordHash("miPassword")
-                .coordenadas(new Coordenadas(new BigDecimal("6.2530"), new BigDecimal("-75.5743")))
-                .build();
-
-        when(passwordEncoder.encode("miPassword")).thenReturn("$2a$10$otroHash");
-        when(gestorRepository.save(gestor)).thenReturn(gestor);
-
-        crearGestorUseCase.ejecutar(gestor);
-
-        assertEquals("$2a$10$otroHash", gestor.getPasswordHash());
-
-        verify(passwordEncoder).encode("miPassword");
-        verify(gestorRepository).save(gestor);
-        verify(crearInventarioUseCase).ejecutar(any()); // 🔥 importante
-    }
-
-    @Test
-    void deberiaMantenerPropiedadesCorrectamente() {
-        Gestor gestor = Gestor.builder()
-                .nombre(new Nombre("Droguería San José"))
-                .nit(new Nit("800987654-2"))
-                .direccion("Carrera 5 #15-20")
-                .telefono(new Telefono("3109876543"))
-                .email(new Email("drogueria@sanjose.com"))
-                .passwordHash("miPassword")
-                .coordenadas(new Coordenadas(new BigDecimal("6.2530"), new BigDecimal("-75.5743")))
-                .build();
-
-        when(passwordEncoder.encode(any())).thenReturn("$2a$10$otroHash");
-        when(gestorRepository.save(gestor)).thenReturn(gestor);
-
-        Gestor resultado = crearGestorUseCase.ejecutar(gestor);
-
-        assertEquals("Droguería San José", resultado.getNombre().valor());
-        assertEquals("800987654-2", resultado.getNit().valor());
-        assertEquals("Carrera 5 #15-20", resultado.getDireccion());
-        assertEquals("3109876543", resultado.getTelefono().valor());
-        assertEquals("drogueria@sanjose.com", resultado.getEmail().valor());
-        assertEquals(new BigDecimal("6.2530"), resultado.getCoordenadas().latitud());
-        assertEquals(new BigDecimal("-75.5743"), resultado.getCoordenadas().longitud());
-
-        verify(crearInventarioUseCase).ejecutar(any()); // 🔥 importante
+        verify(passwordEncoder).encode(PASSWORD);
+        verify(gestorRepository).save(any(Gestor.class));
+        verify(crearInventarioUseCase).ejecutar(any(Inventario.class));
     }
 }

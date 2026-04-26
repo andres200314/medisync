@@ -1,4 +1,5 @@
 package com.medisync.medisync.application.usecases.gestor;
+
 import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.models.Inventario;
@@ -17,9 +18,19 @@ public class CrearGestorUseCase {
         this.crearInventarioUseCase = crearInventarioUseCase;
     }
 
-    public Gestor ejecutar(Gestor gestor) {
+    public Gestor ejecutar(
+            String nombre,
+            String nit,
+            String direccion,
+            String telefono,
+            String email,
+            String password,
+            double latitud,
+            double longitud) {
 
-        gestor.setPasswordHash(passwordEncoder.encode(gestor.getPasswordHash()));
+        String passwordHash = passwordEncoder.encode(password);
+
+        Gestor gestor = Gestor.crear(nombre, nit, direccion, telefono, email, passwordHash, latitud, longitud);
 
         Gestor gestorGuardado = gestorRepository.save(gestor);
 

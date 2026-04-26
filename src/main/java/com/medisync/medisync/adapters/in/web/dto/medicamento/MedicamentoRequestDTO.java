@@ -1,14 +1,7 @@
 package com.medisync.medisync.adapters.in.web.dto.medicamento;
 
-import lombok.*;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class MedicamentoRequestDTO {
-    private String nombre;
-    private Boolean requiereFormula;
-    private String descripcion;
-}
+public record MedicamentoRequestDTO (
+    String nombre,
+    Boolean requiereFormula,
+    String descripcion
+) {}

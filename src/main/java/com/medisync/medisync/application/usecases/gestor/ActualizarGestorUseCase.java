@@ -1,40 +1,40 @@
 package com.medisync.medisync.application.usecases.gestor;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
-import com.medisync.medisync.domain.services.IPasswordEncoder;
+import com.medisync.medisync.domain.valueobjects.*;
 
 public class ActualizarGestorUseCase {
 
     private final IGestorRepository gestorRepository;
-    private final IPasswordEncoder passwordEncoder;
 
-    public ActualizarGestorUseCase(IGestorRepository gestorRepository,
-                                    IPasswordEncoder passwordEncoder) {
+    public ActualizarGestorUseCase(IGestorRepository gestorRepository) {
         this.gestorRepository = gestorRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    public Gestor ejecutar(UUID id, Gestor gestor) {
-        
-        gestorRepository.findById(id)
+    public Gestor ejecutar(UUID id, String nombre, String direccion,
+                           String telefono, String email,
+                           double latitud, double longitud) {
+
+        Gestor gestorExistente = gestorRepository.findById(id)
                 .orElseThrow(() -> new GestorNotFoundException(id.toString()));
 
-      
-        Gestor actualizado = Gestor.builder()
+        Gestor gestorActualizado = Gestor.builder()
                 .id(id)
-                .nombre(gestor.getNombre())  
-                .nit(gestor.getNit())        
-                .direccion(gestor.getDireccion())
-                .telefono(gestor.getTelefono())  
-                .email(gestor.getEmail())       
-                .passwordHash(passwordEncoder.encode(gestor.getPasswordHash()))
-                .coordenadas(gestor.getCoordenadas())  
+                .nombre(new Nombre(nombre != null ? nombre : gestorExistente.getNombre().valor()))
+                .nit(gestorExistente.getNit())
+                .direccion(direccion != null ? direccion : gestorExistente.getDireccion())
+                .telefono(new Telefono(telefono != null ? telefono : gestorExistente.getTelefono().valor()))
+                .email(new Email(email != null ? email : gestorExistente.getEmail().valor()))
+                .passwordHash(gestorExistente.getPasswordHash())
+                .coordenadas(new Coordenadas(BigDecimal.valueOf(latitud), BigDecimal.valueOf(longitud)))
+                .estado(gestorExistente.getEstado())
                 .build();
 
-        return gestorRepository.save(actualizado);
+        return gestorRepository.save(gestorActualizado);
     }
 }

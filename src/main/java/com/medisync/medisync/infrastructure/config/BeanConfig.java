@@ -48,6 +48,11 @@ public class BeanConfig {
         return new ObtenerInventariosUseCase(inventarioRepository);
     }
 
+    @Bean
+    public ObtenerInventarioPorGestorUseCase obtenerInventarioPorGestorUseCase(IInventarioRepository inventarioRepository) {
+        return new ObtenerInventarioPorGestorUseCase(inventarioRepository);
+    }
+
     // Gestor
     @Bean
     public CrearGestorUseCase crearGestorUseCase(IGestorRepository gestorRepository,
@@ -64,5 +69,24 @@ public class BeanConfig {
     @Bean
     public ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase(IGestorRepository gestorRepository) {
         return new ObtenerGestorPorIdUseCase(gestorRepository);
+    }
+
+    @Bean
+    public ActualizarGestorUseCase actualizarGestorUseCase(IGestorRepository gestorRepository) {
+        return new ActualizarGestorUseCase(gestorRepository);
+    }
+
+    @Bean
+    public CambiarPasswordGestorUseCase cambiarPasswordGestorUseCase(
+            IGestorRepository gestorRepository,
+            IPasswordEncoder passwordEncoder) {
+        return new CambiarPasswordGestorUseCase(gestorRepository, passwordEncoder);
+    }
+
+    @Bean
+    public EliminarGestorUseCase eliminarGestorUseCase(
+            IGestorRepository gestorRepository,
+            IInventarioRepository inventarioRepository) {
+        return new EliminarGestorUseCase(gestorRepository, inventarioRepository);
     }
 }

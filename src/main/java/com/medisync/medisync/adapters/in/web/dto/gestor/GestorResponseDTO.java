@@ -1,26 +1,28 @@
 package com.medisync.medisync.adapters.in.web.dto.gestor;
 
-import java.math.BigDecimal;
 import java.util.UUID;
+import com.medisync.medisync.domain.models.Gestor;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class GestorResponseDTO {
-    private UUID id;
-    private String nombre;
-    private String nit;
-    private String direccion;
-    private String telefono;
-    private String email;
-    private BigDecimal latitud;
-    private BigDecimal longitud;
+public record GestorResponseDTO(
+        UUID id,
+        String nombre,
+        String nit,
+        String direccion,
+        String telefono,
+        String email,
+        double latitud,
+        double longitud
+) {
+    public static GestorResponseDTO from(Gestor gestor) {
+        return new GestorResponseDTO(
+                gestor.getId(),
+                gestor.getNombre().valor(),
+                gestor.getNit().valor(),
+                gestor.getDireccion(),
+                gestor.getTelefono().valor(),
+                gestor.getEmail().valor(),
+                gestor.getCoordenadas().latitud().doubleValue(),
+                gestor.getCoordenadas().longitud().doubleValue()
+        );
+    }
 }

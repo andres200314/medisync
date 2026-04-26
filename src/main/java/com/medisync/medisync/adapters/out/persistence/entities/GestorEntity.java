@@ -1,5 +1,6 @@
 package com.medisync.medisync.adapters.out.persistence.entities;
 
+import com.medisync.medisync.domain.enums.EstadoGestor;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +35,10 @@ public class GestorEntity {
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EstadoGestor estado;
 
     private BigDecimal latitud;
 

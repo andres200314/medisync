@@ -1,17 +1,15 @@
 package com.medisync.medisync.adapters.in.web.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.medisync.medisync.application.usecases.inventario.ObtenerInventarioPorGestorUseCase;
+import com.medisync.medisync.application.usecases.inventario.ObtenerInventariosUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.medisync.medisync.adapters.in.web.dto.inventario.InventarioResponseDTO;
-import com.medisync.medisync.adapters.in.web.mappers.InventarioMapper;
-import com.medisync.medisync.application.usecases.inventario.ObtenerInventariosUseCase;
-import com.medisync.medisync.domain.models.Inventario;
 
 @RestController
 @RequestMapping("/api/inventario")
@@ -19,12 +17,23 @@ import com.medisync.medisync.domain.models.Inventario;
 public class InventarioController {
 
     private final ObtenerInventariosUseCase obtenerInventariosUseCase;
-    private final InventarioMapper mapper;
-
+    private final ObtenerInventarioPorGestorUseCase obtenerInventarioPorGestorIdUseCase;
 
     @GetMapping
     public ResponseEntity<List<InventarioResponseDTO>> obtenerTodos() {
-        List<Inventario> inventarios = obtenerInventariosUseCase.ejecutar();
-        return ResponseEntity.ok(inventarios.stream().map(mapper::toResponse).toList());
+
+        var inventarios = obtenerInventariosUseCase.ejecutar().stream()
+                .map(InventarioResponseDTO::from)
+                .toList();
+
+        return ResponseEntity.ok(inventarios);
+    }
+
+    @GetMapping("/gestor/{gestorId}")
+    public ResponseEntity<InventarioResponseDTO> obtenerPorGestorId(@PathVariable UUID gestorId) {
+
+        var inventario = obtenerInventarioPorGestorIdUseCase.ejecutar(gestorId);
+
+        return ResponseEntity.ok(InventarioResponseDTO.from(inventario));
     }
 }

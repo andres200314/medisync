@@ -18,22 +18,19 @@ import com.medisync.medisync.domain.repositories.IInventarioRepository;
 public class InventarioRepositoryImpl implements IInventarioRepository {
 
     private final InventarioJpaRepository jpaRepository;
-    private final InventarioEntityMapper mapper;
 
-    public InventarioRepositoryImpl(InventarioJpaRepository jpaRepository,
-                                    InventarioEntityMapper mapper) {
+    // Constructor sin mapper
+    public InventarioRepositoryImpl(InventarioJpaRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
-        this.mapper = mapper;
     }
 
     @Override
     @Transactional
     public Inventario save(Inventario inventario) {
-        InventarioEntity entity = mapper.toEntity(inventario);
-
+        // Usar métodos estáticos del mapper
+        InventarioEntity entity = InventarioEntityMapper.toEntity(inventario);
         InventarioEntity guardado = jpaRepository.save(entity);
-
-        return mapper.toDomain(guardado);
+        return InventarioEntityMapper.toDomain(guardado);
     }
 
     @Override
@@ -48,19 +45,19 @@ public class InventarioRepositoryImpl implements IInventarioRepository {
     @Override
     public Optional<Inventario> findById(UUID id) {
         return jpaRepository.findById(id)
-                .map(mapper::toDomain);
+                .map(InventarioEntityMapper::toDomain);
     }
 
     @Override
     public List<Inventario> findAll() {
         return jpaRepository.findAll().stream()
-                .map(mapper::toDomain)
+                .map(InventarioEntityMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Inventario> findByGestorId(UUID gestorId) {
         return jpaRepository.findByGestorId(gestorId)
-                .map(mapper::toDomain);
+                .map(InventarioEntityMapper::toDomain);
     }
 }

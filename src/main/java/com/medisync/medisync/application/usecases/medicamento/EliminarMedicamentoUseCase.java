@@ -2,7 +2,7 @@ package com.medisync.medisync.application.usecases.medicamento;
 
 import java.util.UUID;
 
-import com.medisync.medisync.adapters.in.web.exceptions.MedicamentoNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
 

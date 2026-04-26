@@ -7,30 +7,25 @@ import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.valueobjects.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
+@NoArgsConstructor  // Constructor vacío
 public class InventarioEntityMapper {
 
-    private final GestorEntityMapper gestorMapper;
-
-
-    public Inventario toDomain(InventarioEntity entity) {
+    public static Inventario toDomain(InventarioEntity entity) {
         if (entity == null) {
             return null;
         }
 
-
-        Gestor gestor = gestorMapper.toDomain(entity.getGestor());
+        // Llama directamente al método estático de GestorEntityMapper
+        Gestor gestor = GestorEntityMapper.toDomain(entity.getGestor());
 
         // Convertir items
         List<ItemInventario> items = entity.getItems().stream()
-                .map(this::toItemInventario)
+                .map(InventarioEntityMapper::toItemInventario)
                 .collect(Collectors.toList());
 
         return Inventario.builder()
@@ -40,16 +35,15 @@ public class InventarioEntityMapper {
                 .build();
     }
 
-    public InventarioEntity toEntity(Inventario inventario) {
+    public static InventarioEntity toEntity(Inventario inventario) {
         if (inventario == null) {
             return null;
         }
 
         InventarioEntity entity = InventarioEntity.builder()
                 .id(inventario.getId())
-                .gestor(gestorMapper.toEntity(inventario.getGestor()))
+                .gestor(GestorEntityMapper.toEntity(inventario.getGestor()))
                 .build();
-
 
         List<InventarioMedicamentoEntity> itemsEntity = inventario.getItems().stream()
                 .map(item -> toInventarioMedicamentoEntity(item, entity))
@@ -60,8 +54,7 @@ public class InventarioEntityMapper {
         return entity;
     }
 
-
-    private InventarioMedicamentoEntity toInventarioMedicamentoEntity(ItemInventario item, InventarioEntity inventarioEntity) {
+    private static InventarioMedicamentoEntity toInventarioMedicamentoEntity(ItemInventario item, InventarioEntity inventarioEntity) {
         MedicamentoEntity medicamentoEntity = MedicamentoEntity.builder()
                 .id(item.medicamento().getId())
                 .build();
@@ -75,8 +68,7 @@ public class InventarioEntityMapper {
                 .build();
     }
 
-
-    private ItemInventario toItemInventario(InventarioMedicamentoEntity entity) {
+    private static ItemInventario toItemInventario(InventarioMedicamentoEntity entity) {
         // Convertir medicamento (solo datos básicos para el dominio)
         Medicamento medicamento = Medicamento.builder()
                 .id(entity.getMedicamento().getId())

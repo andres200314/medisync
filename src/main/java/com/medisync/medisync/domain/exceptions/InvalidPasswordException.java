@@ -1,6 +1,4 @@
-package com.medisync.medisync.adapters.in.web.exceptions;
-
-import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
+package com.medisync.medisync.domain.exceptions;
 
 public class InvalidPasswordException extends BusinessRuleViolationException {
     

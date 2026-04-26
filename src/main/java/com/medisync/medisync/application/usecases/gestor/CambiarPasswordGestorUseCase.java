@@ -2,8 +2,8 @@ package com.medisync.medisync.application.usecases.gestor;
 
 import java.util.UUID;
 
-import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
-import com.medisync.medisync.adapters.in.web.exceptions.InvalidPasswordException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.InvalidPasswordException;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.services.IPasswordEncoder;

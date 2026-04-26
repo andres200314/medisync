@@ -17,8 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
-import com.medisync.medisync.adapters.in.web.exceptions.InvalidPasswordException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.InvalidPasswordException;
 import com.medisync.medisync.domain.enums.EstadoGestor;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;

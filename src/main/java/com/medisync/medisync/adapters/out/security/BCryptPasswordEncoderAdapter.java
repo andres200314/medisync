@@ -1,4 +1,4 @@
-package com.medisync.medisync.infrastructure.config;
+package com.medisync.medisync.adapters.out.security;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

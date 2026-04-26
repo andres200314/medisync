@@ -30,6 +30,10 @@ public class Medicamento {
         normalizarNombre();
     }
 
+    public static Medicamento crear(String nombre, Boolean requiereFormula, String descripcion) {
+        return new Medicamento(nombre, requiereFormula, descripcion);
+    }
+
     public void validar() {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new BusinessRuleViolationException("El nombre no puede estar vacío");
@@ -53,5 +57,12 @@ public class Medicamento {
             this.nombre = nombre.trim().substring(0, 1).toUpperCase()
                     + nombre.trim().substring(1).toLowerCase();
         }
+    }
+
+    public void actualizar(String nombre, String descripcion) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        validar();
+        normalizarNombre();
     }
 }

@@ -1,16 +1,12 @@
 package com.medisync.medisync.adapters.out.persistence.mappers;
 
 import com.medisync.medisync.domain.valueobjects.*;
-import org.springframework.stereotype.Component;
-
 import com.medisync.medisync.adapters.out.persistence.entities.GestorEntity;
 import com.medisync.medisync.domain.models.Gestor;
 
-
-@Component
 public class GestorEntityMapper {
 
-    public Gestor toDomain(GestorEntity entity) {
+    public static Gestor toDomain(GestorEntity entity) {
         return Gestor.builder()
                 .id(entity.getId())
                 .nombre(new Nombre(entity.getNombre()))
@@ -20,10 +16,11 @@ public class GestorEntityMapper {
                 .email(new Email(entity.getEmail()))
                 .passwordHash(entity.getPasswordHash())
                 .coordenadas(new Coordenadas(entity.getLatitud(), entity.getLongitud()))
+                .estado(entity.getEstado())
                 .build();
     }
 
-    public GestorEntity toEntity(Gestor gestor) {
+    public static GestorEntity toEntity(Gestor gestor) {
         return GestorEntity.builder()
                 .id(gestor.getId())
                 .nombre(gestor.getNombre().valor())
@@ -34,6 +31,7 @@ public class GestorEntityMapper {
                 .passwordHash(gestor.getPasswordHash())
                 .latitud(gestor.getCoordenadas().latitud())
                 .longitud(gestor.getCoordenadas().longitud())
+                .estado(gestor.getEstado())
                 .build();
     }
 }
