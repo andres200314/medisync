@@ -12,4 +12,5 @@ public interface IGestorRepository {
     void deleteById(UUID id);
     Optional<Gestor> findById(UUID id);
     List<Gestor> findAll();
+    Optional<Gestor> findByEmail(String email);
 }

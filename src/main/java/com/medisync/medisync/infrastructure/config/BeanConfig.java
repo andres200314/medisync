@@ -1,17 +1,34 @@
 package com.medisync.medisync.infrastructure.config;
 
-import com.medisync.medisync.application.usecases.gestor.*;
-import com.medisync.medisync.application.usecases.inventario.*;
-import com.medisync.medisync.application.usecases.medicamento.*;
-import com.medisync.medisync.domain.repositories.*;
-import com.medisync.medisync.domain.services.IPasswordEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.medisync.medisync.application.usecases.gestor.ActualizarGestorUseCase;
+import com.medisync.medisync.application.usecases.gestor.CambiarPasswordGestorUseCase;
+import com.medisync.medisync.application.usecases.gestor.EliminarGestorUseCase;
+import com.medisync.medisync.application.usecases.gestor.LoginUseCase;
+import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
+import com.medisync.medisync.application.usecases.gestor.ObtenerGestoresUseCase;
+import com.medisync.medisync.application.usecases.gestor.RegistrarGestorUseCase;
+import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
+import com.medisync.medisync.application.usecases.inventario.ObtenerInventarioPorGestorUseCase;
+import com.medisync.medisync.application.usecases.inventario.ObtenerInventariosUseCase;
+import com.medisync.medisync.application.usecases.medicamento.ActualizarMedicamentoUseCase;
+import com.medisync.medisync.application.usecases.medicamento.CrearMedicamentoUseCase;
+import com.medisync.medisync.application.usecases.medicamento.EliminarMedicamentoUseCase;
+import com.medisync.medisync.application.usecases.medicamento.ObtenerMedicamentoPorIdUseCase;
+import com.medisync.medisync.application.usecases.medicamento.ObtenerMedicamentosUseCase;
+import com.medisync.medisync.domain.repositories.IGestorRepository;
+import com.medisync.medisync.domain.repositories.IInventarioRepository;
+import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
+import com.medisync.medisync.domain.services.IPasswordEncoder;
+import com.medisync.medisync.infrastructure.security.JwtService;
 
 @Configuration
 public class BeanConfig {
 
-    // Medicamento
+    // ── Medicamento ───────────────────────────────────────────────────────────
+
     @Bean
     public CrearMedicamentoUseCase crearMedicamentoUseCase(IMedicamentoRepository medicamentoRepository) {
         return new CrearMedicamentoUseCase(medicamentoRepository);
@@ -37,7 +54,8 @@ public class BeanConfig {
         return new ActualizarMedicamentoUseCase(medicamentoRepository);
     }
 
-    // Inventario
+    // ── Inventario ────────────────────────────────────────────────────────────
+
     @Bean
     public CrearInventarioUseCase crearInventarioUseCase(IInventarioRepository inventarioRepository) {
         return new CrearInventarioUseCase(inventarioRepository);
@@ -53,12 +71,20 @@ public class BeanConfig {
         return new ObtenerInventarioPorGestorUseCase(inventarioRepository);
     }
 
-    // Gestor
+    // ── Gestor ────────────────────────────────────────────────────────────────
+
     @Bean
-    public CrearGestorUseCase crearGestorUseCase(IGestorRepository gestorRepository,
-                                                 IPasswordEncoder passwordEncoder,
-                                                 CrearInventarioUseCase crearInventarioUseCase) {
-        return new CrearGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
+    public RegistrarGestorUseCase registrarGestorUseCase(IGestorRepository gestorRepository,
+                                                         IPasswordEncoder passwordEncoder,
+                                                         CrearInventarioUseCase crearInventarioUseCase) {
+        return new RegistrarGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
+    }
+
+    @Bean
+    public LoginUseCase loginUseCase(IGestorRepository gestorRepository,
+                                     IPasswordEncoder passwordEncoder,
+                                     JwtService jwtService) {
+        return new LoginUseCase(gestorRepository, passwordEncoder, jwtService);
     }
 
     @Bean
