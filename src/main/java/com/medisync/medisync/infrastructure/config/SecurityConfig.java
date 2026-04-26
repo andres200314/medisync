@@ -4,6 +4,7 @@ import com.medisync.medisync.infrastructure.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +27,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+
+                        // Consultas públicas
+                        .requestMatchers(HttpMethod.GET, "/api/medicamentos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gestores/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/inventario/**").permitAll()
+
+                        // Las demas con token
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

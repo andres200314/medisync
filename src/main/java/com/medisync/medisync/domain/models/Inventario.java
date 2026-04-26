@@ -47,6 +47,38 @@ public class Inventario {
         }
     }
 
+    public void ajustarStock(Medicamento medicamento, int delta) {
+        validarGestorActivo();
+        validarMedicamento(medicamento);
+
+        ItemInventario existente = buscarItem(medicamento);
+        if (existente == null) {
+            throw new BusinessRuleViolationException("El medicamento no existe en el inventario");
+        }
+
+        ItemInventario actualizado = delta >= 0
+                ? existente.aumentarStock(delta)
+                : existente.reducirStock(-delta);
+        actualizarItem(existente, actualizado);
+    }
+
+    public void establecerStock(Medicamento medicamento, int cantidad) {
+        validarGestorActivo();
+        validarMedicamento(medicamento);
+
+        ItemInventario existente = buscarItem(medicamento);
+        if (existente == null) {
+            throw new BusinessRuleViolationException("El medicamento no existe en el inventario");
+        }
+
+        ItemInventario actualizado = new ItemInventario(
+                existente.medicamento(),
+                Cantidad.of(cantidad),
+                existente.precioUnitario()
+        );
+        actualizarItem(existente, actualizado);
+    }
+
     public void reducirStock(Medicamento medicamento, int cantidad) {
 
         validarGestorActivo();

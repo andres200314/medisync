@@ -1,32 +1,37 @@
 package com.medisync.medisync.application.usecases.inventario;
 
-
-import com.medisync.medisync.domain.enums.EstadoGestor;
+import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.models.Medicamento;
+import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.repositories.IInventarioRepository;
-import com.medisync.medisync.domain.valueobjects.*;
+import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 @ExtendWith(MockitoExtension.class)
 class AgregarMedicamentoInventarioUseCaseTest {
 
     @Mock
     private IInventarioRepository inventarioRepository;
+
+    @Mock
+    private IMedicamentoRepository medicamentoRepository;
+
+    @Mock
+    private IGestorRepository gestorRepository;
 
     @InjectMocks
     private AgregarMedicamentoInventarioUseCase useCase;
@@ -36,99 +41,110 @@ class AgregarMedicamentoInventarioUseCaseTest {
         UUID gestorId = UUID.randomUUID();
         UUID medicamentoId = UUID.randomUUID();
 
-        Gestor gestor = Gestor.builder()
-                .id(gestorId)
-                .nombre(Nombre.of("Farmacia"))
-                .estado(EstadoGestor.ACTIVO)
-                .build();
+        Gestor gestorMock = mock(Gestor.class);
+        Inventario inventarioMock = mock(Inventario.class);
+        Medicamento medicamentoMock = mock(Medicamento.class);
 
-        Medicamento medicamento = Medicamento.builder()
-                .id(medicamentoId)
-                .nombre("Ibuprofeno")
-                .build();
-
-        Inventario inventario = Inventario.builder()
-                .gestor(gestor)
-                .items(new ArrayList<>())
-                .build();
+        when(gestorRepository.findById(gestorId))
+                .thenReturn(Optional.of(gestorMock));
 
         when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.of(inventario));
+                .thenReturn(Optional.of(inventarioMock));
 
-        when(inventarioRepository.save(inventario))
-                .thenReturn(inventario);
+        when(medicamentoRepository.findById(medicamentoId))
+                .thenReturn(Optional.of(medicamentoMock));
 
-        Cantidad cantidad = Cantidad.of(10);
-        Precio precio = Precio.of(BigDecimal.valueOf(5000));
-
-        Inventario resultado = useCase.ejecutar(gestorId, medicamento, cantidad, precio);
-
-        assertEquals(1, resultado.getItems().size());
-        assertEquals(10, resultado.getItems().getFirst().cantidad().valor());
-
-        verify(inventarioRepository).save(inventario);
-    }
-
-    @Test
-    void deberiaSumarStockSiYaExiste() {
-        UUID gestorId = UUID.randomUUID();
-        UUID medicamentoId = UUID.randomUUID();
-
-        Gestor gestor = Gestor.builder()
-                .id(gestorId)
-                .nombre(Nombre.of("Farmacia"))
-                .estado(EstadoGestor.ACTIVO)
-                .build();
-
-        Medicamento medicamento = Medicamento.builder()
-                .id(medicamentoId)
-                .nombre("Ibuprofeno")
-                .build();
-
-        ItemInventario itemExistente = new ItemInventario(
-                medicamento,
-                Cantidad.of(10),
-                Precio.of(BigDecimal.valueOf(5000))
-        );
-
-        Inventario inventario = Inventario.builder()
-                .gestor(gestor)
-                .items(new ArrayList<>(java.util.List.of(itemExistente)))
-                .build();
-
-        when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.of(inventario));
-
-        when(inventarioRepository.save(inventario))
-                .thenReturn(inventario);
+        when(inventarioRepository.save(inventarioMock))
+                .thenReturn(inventarioMock);
 
         Inventario resultado = useCase.ejecutar(
                 gestorId,
-                medicamento,
-                Cantidad.of(5),
-                Precio.of(BigDecimal.valueOf(5000))
+                medicamentoId,
+                10,
+                BigDecimal.valueOf(5000)
         );
 
-        assertEquals(1, resultado.getItems().size());
-        assertEquals(15, resultado.getItems().getFirst().cantidad().valor());
+        assertNotNull(resultado);
 
-        verify(inventarioRepository).save(inventario);
+        verify(inventarioMock).agregarMedicamento(
+                eq(medicamentoMock),
+                any(),
+                any()
+        );
+
+        verify(inventarioRepository).save(inventarioMock);
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiGestorNoExiste() {
+        UUID gestorId = UUID.randomUUID();
+        UUID medicamentoId = UUID.randomUUID();
+
+        when(gestorRepository.findById(gestorId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(BusinessRuleViolationException.class, () ->
+                useCase.ejecutar(gestorId, medicamentoId, 10, BigDecimal.TEN)
+        );
+
+        verify(gestorRepository).findById(gestorId);
+        verifyNoInteractions(inventarioRepository, medicamentoRepository);
     }
 
     @Test
     void deberiaLanzarExcepcionSiInventarioNoExiste() {
         UUID gestorId = UUID.randomUUID();
+        UUID medicamentoId = UUID.randomUUID();
+
+        Gestor gestorMock = mock(Gestor.class);
+
+        when(gestorRepository.findById(gestorId))
+                .thenReturn(Optional.of(gestorMock));
 
         when(inventarioRepository.findByGestorId(gestorId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () ->
-                useCase.ejecutar(
-                        gestorId,
-                        Medicamento.builder().id(UUID.randomUUID()).build(),
-                        Cantidad.of(10),
-                        Precio.of(BigDecimal.valueOf(1000))
-                )
+        assertThrows(BusinessRuleViolationException.class, () ->
+                useCase.ejecutar(gestorId, medicamentoId, 10, BigDecimal.TEN)
         );
+
+        verify(gestorRepository).findById(gestorId);
+        verify(inventarioRepository).findByGestorId(gestorId);
+        verifyNoInteractions(medicamentoRepository);
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiMedicamentoNoExiste() {
+        UUID gestorId = UUID.randomUUID();
+        UUID medicamentoId = UUID.randomUUID();
+
+        Gestor gestorMock = mock(Gestor.class);
+        Inventario inventarioMock = mock(Inventario.class);
+
+        when(gestorRepository.findById(gestorId))
+                .thenReturn(Optional.of(gestorMock));
+
+        when(inventarioRepository.findByGestorId(gestorId))
+                .thenReturn(Optional.of(inventarioMock));
+
+        when(medicamentoRepository.findById(medicamentoId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(MedicamentoNotFoundException.class, () ->
+                useCase.ejecutar(gestorId, medicamentoId, 10, BigDecimal.TEN)
+        );
+
+        verify(gestorRepository).findById(gestorId);
+        verify(inventarioRepository).findByGestorId(gestorId);
+        verify(medicamentoRepository).findById(medicamentoId);
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiIdsSonNulos() {
+        assertThrows(BusinessRuleViolationException.class, () ->
+                useCase.ejecutar(null, null, 10, BigDecimal.TEN)
+        );
+
+        verifyNoInteractions(gestorRepository, inventarioRepository, medicamentoRepository);
     }
 }

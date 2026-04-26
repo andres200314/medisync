@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.medisync.medisync.adapters.out.persistence.entities.InventarioMedicamentoEntity;
+import com.medisync.medisync.adapters.out.persistence.entities.MedicamentoEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +29,35 @@ public class InventarioRepositoryImpl implements IInventarioRepository {
     @Override
     @Transactional
     public Inventario save(Inventario inventario) {
-        // Usar métodos estáticos del mapper
-        InventarioEntity entity = InventarioEntityMapper.toEntity(inventario);
-        InventarioEntity guardado = jpaRepository.save(entity);
-        return InventarioEntityMapper.toDomain(guardado);
+        InventarioEntity entity = inventario.getId() != null
+                ? jpaRepository.findById(inventario.getId())
+                  .orElse(InventarioEntityMapper.toEntity(inventario))
+                : InventarioEntityMapper.toEntity(inventario);
+
+        inventario.getItems().forEach(item -> {
+            boolean yaExiste = entity.getItems().stream()
+                    .anyMatch(e -> e.getMedicamento().getId().equals(item.medicamento().getId()));
+
+            if (yaExiste) {
+                entity.getItems().stream()
+                        .filter(e -> e.getMedicamento().getId().equals(item.medicamento().getId()))
+                        .findFirst()
+                        .ifPresent(e -> {
+                            e.setCantidad(item.cantidad().valor());
+                            e.setPrecioUnitario(item.precioUnitario().valor());
+                        });
+            } else {
+                entity.getItems().add(InventarioMedicamentoEntity.builder()
+                        .id(null)
+                        .inventario(entity)
+                        .medicamento(MedicamentoEntity.builder().id(item.medicamento().getId()).build())
+                        .cantidad(item.cantidad().valor())
+                        .precioUnitario(item.precioUnitario().valor())
+                        .build());
+            }
+        });
+
+        return InventarioEntityMapper.toDomain(jpaRepository.save(entity));
     }
 
     @Override
