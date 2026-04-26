@@ -2,16 +2,17 @@ package com.medisync.medisync.adapters.in.web.exceptions;
 
 import java.util.Map;
 
-import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
-import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.medisync.medisync.domain.exceptions.BusinessRuleViolationException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -37,7 +38,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String message = ex.getMostSpecificCause().getMessage();
-
         if (message.contains("email")) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "Ya existe un gestor con ese email"));
@@ -55,11 +55,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", ex.getMessage()));
     }
+
     @ExceptionHandler(BusinessRuleViolationException.class)
     public ResponseEntity<Map<String, String>> handleBusinessRuleViolation(BusinessRuleViolationException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(Map.of("error", ex.getMessage()));
     }
 
-   
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "No tienes permisos para realizar esta acción"));
+    }
 }

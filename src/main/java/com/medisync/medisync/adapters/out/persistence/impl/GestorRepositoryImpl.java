@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import com.medisync.medisync.adapters.out.persistence.entities.GestorEntity;
@@ -12,6 +11,8 @@ import com.medisync.medisync.adapters.out.persistence.jpa.GestorJpaRepository;
 import com.medisync.medisync.adapters.out.persistence.mappers.GestorEntityMapper;
 import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -42,5 +43,11 @@ public class GestorRepositoryImpl implements IGestorRepository {
         return jpaRepository.findAll().stream()
                 .map(GestorEntityMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Gestor> findByEmail(String email) {
+        return jpaRepository.findByEmail(email)
+                .map(GestorEntityMapper::toDomain);
     }
 }

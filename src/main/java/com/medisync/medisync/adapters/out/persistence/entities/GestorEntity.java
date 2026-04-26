@@ -1,46 +1,57 @@
-package com.medisync.medisync.adapters.out.persistence.entities;
+    package com.medisync.medisync.adapters.out.persistence.entities;
 
-import com.medisync.medisync.domain.enums.EstadoGestor;
-import jakarta.persistence.*;
-import lombok.*;
+    import java.math.BigDecimal;
+    import java.util.UUID;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+    import com.medisync.medisync.domain.enums.EstadoGestor;
 
-@Entity
-@Table(name = "gestores")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class GestorEntity {
+    import jakarta.persistence.Column;
+    import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+    @Entity
+    @Table(name = "gestores")
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public class GestorEntity {
 
-    @Column(nullable = false)
-    private String nombre;
+        @Id
+        @GeneratedValue
+        private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String nit;
+        @Column(nullable = false)
+        private String nombre;
 
-    private String direccion;
+        @Column(nullable = false, unique = true)
+        private String nit;
 
-    private String telefono;
+        private String direccion;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+        private String telefono;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+        @Column(nullable = false, unique = true)
+        private String email;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EstadoGestor estado;
+        @Column(name = "password_hash", nullable = false)
+        private String passwordHash;
 
-    private BigDecimal latitud;
+        @Column(nullable = false)
+        @Enumerated(EnumType.STRING)
+        private EstadoGestor estado;
 
-    private BigDecimal longitud;
-}
+        private BigDecimal latitud;
+
+        private BigDecimal longitud;
+    }

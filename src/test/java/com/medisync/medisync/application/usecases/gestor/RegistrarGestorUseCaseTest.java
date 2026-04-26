@@ -2,13 +2,15 @@ package com.medisync.medisync.application.usecases.gestor;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.medisync.medisync.application.usecases.inventario.CrearInventarioUseCase;
@@ -18,7 +20,7 @@ import com.medisync.medisync.domain.repositories.IGestorRepository;
 import com.medisync.medisync.domain.services.IPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class CrearGestorUseCaseTest {
+class RegistrarGestorUseCaseTest {
 
     @Mock
     private IGestorRepository gestorRepository;
@@ -29,7 +31,7 @@ class CrearGestorUseCaseTest {
     @Mock
     private CrearInventarioUseCase crearInventarioUseCase;
 
-    private CrearGestorUseCase crearGestorUseCase;
+    private RegistrarGestorUseCase registrarGestorUseCase;
 
     private static final String NOMBRE = "Farmacia Central";
     private static final String NIT = "900123456-1";
@@ -43,7 +45,7 @@ class CrearGestorUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        crearGestorUseCase = new CrearGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
+        registrarGestorUseCase = new RegistrarGestorUseCase(gestorRepository, passwordEncoder, crearInventarioUseCase);
     }
 
     @Test
@@ -68,7 +70,7 @@ class CrearGestorUseCaseTest {
         when(crearInventarioUseCase.ejecutar(any(Inventario.class))).thenAnswer(i -> i.getArgument(0));
 
         // When
-        Gestor resultado = crearGestorUseCase.ejecutar(NOMBRE, NIT, DIRECCION, TELEFONO, EMAIL, PASSWORD, LATITUD, LONGITUD);
+        Gestor resultado = registrarGestorUseCase.ejecutar(NOMBRE, NIT, DIRECCION, TELEFONO, EMAIL, PASSWORD, LATITUD, LONGITUD);
 
         // Then
         assertNotNull(resultado.getId());
