@@ -3,7 +3,7 @@ package com.medisync.medisync.adapters.in.web.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
+import com.medisync.medisync.application.usecases.gestor.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorRequestDTO;
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorResponseDTO;
-import com.medisync.medisync.adapters.in.web.mappers.GestorMapper;
-import com.medisync.medisync.application.usecases.gestor.CrearGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestoresUseCase;
-import com.medisync.medisync.domain.models.Gestor;
 
 @RestController
 @RequestMapping("/api/gestores")
@@ -24,23 +20,69 @@ public class GestorController {
     private final CrearGestorUseCase crearGestorUseCase;
     private final ObtenerGestoresUseCase obtenerGestoresUseCase;
     private final ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase;
-    private final GestorMapper mapper;
+    private final ActualizarGestorUseCase actualizarGestorUseCase;
+    private final EliminarGestorUseCase eliminarGestorUseCase;
 
     @PostMapping
     public ResponseEntity<GestorResponseDTO> crear(@RequestBody GestorRequestDTO request) {
-        Gestor creado = crearGestorUseCase.ejecutar(mapper.toDomain(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
+
+        var gestor = crearGestorUseCase.ejecutar(
+                request.nombre(),
+                request.nit(),
+                request.direccion(),
+                request.telefono(),
+                request.email(),
+                request.password(),
+                request.latitud(),
+                request.longitud()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(GestorResponseDTO.from(gestor));
     }
 
     @GetMapping
     public ResponseEntity<List<GestorResponseDTO>> obtenerTodos() {
-        List<Gestor> gestores = obtenerGestoresUseCase.ejecutar();
-        return ResponseEntity.ok(gestores.stream().map(mapper::toResponse).toList());
+
+        var gestores = obtenerGestoresUseCase.ejecutar().stream()
+                .map(GestorResponseDTO::from)
+                .toList();
+
+        return ResponseEntity.ok(gestores);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GestorResponseDTO> obtenerPorId(@PathVariable UUID id) {
-        Gestor gestor = obtenerGestorPorIdUseCase.ejecutar(id);
-        return ResponseEntity.ok(mapper.toResponse(gestor));
+
+        var gestor = obtenerGestorPorIdUseCase.ejecutar(id);
+
+        return ResponseEntity.ok(GestorResponseDTO.from(gestor));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GestorResponseDTO> actualizar(
+            @PathVariable UUID id,
+            @RequestBody GestorRequestDTO request) {
+
+        var gestor = actualizarGestorUseCase.ejecutar(
+                id,
+                request.nombre(),
+                request.direccion(),
+                request.telefono(),
+                request.email(),
+                request.latitud(),
+                request.longitud()
+        );
+
+        return ResponseEntity.ok(GestorResponseDTO.from(gestor));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
+
+        eliminarGestorUseCase.ejecutar(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

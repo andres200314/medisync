@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.medisync.medisync.adapters.in.web.exceptions.MedicamentoNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 
@@ -32,11 +31,12 @@ class ActualizarMedicamentoUseCaseTest {
     @InjectMocks
     private ActualizarMedicamentoUseCase actualizarMedicamentoUseCase;
 
+    private static final String NOMBRE = "Paracetamol";
+    private static final String DESCRIPCION = "Analgésico y antipirético";
+
     @Test
     void deberiaActualizarMedicamentoExitosamente() {
-        // ARRANGE
         UUID id = UUID.randomUUID();
-
         Medicamento existente = Medicamento.builder()
                 .id(id)
                 .nombre("Ibuprofeno")
@@ -44,58 +44,37 @@ class ActualizarMedicamentoUseCaseTest {
                 .descripcion("Antiinflamatorio")
                 .build();
 
-        Medicamento actualizado = Medicamento.builder()
-                .id(id)
-                .nombre("Paracetamol")
-                .requiereFormula(false)
-                .descripcion("Analgésico y antipirético")
-                .build();
-
         when(medicamentoRepository.findById(id)).thenReturn(Optional.of(existente));
-        when(medicamentoRepository.save(any(Medicamento.class))).thenReturn(actualizado);
+        when(medicamentoRepository.save(any(Medicamento.class))).thenAnswer(i -> i.getArgument(0));
 
-        // ACT
-        Medicamento resultado = actualizarMedicamentoUseCase.ejecutar(id, actualizado);
+        Medicamento resultado = actualizarMedicamentoUseCase.ejecutar(id, NOMBRE, DESCRIPCION);
 
-        // ASSERT
         assertNotNull(resultado);
         assertEquals(id, resultado.getId());
         assertEquals("Paracetamol", resultado.getNombre());
-        assertFalse(resultado.getRequiereFormula());
-        assertEquals("Analgésico y antipirético", resultado.getDescripcion());
+        assertEquals(DESCRIPCION, resultado.getDescripcion());
         verify(medicamentoRepository, times(1)).findById(id);
         verify(medicamentoRepository, times(1)).save(any(Medicamento.class));
     }
 
     @Test
     void deberiaLanzarExcepcionCuandoMedicamentoNoExiste() {
-        // ARRANGE
         UUID id = UUID.randomUUID();
-
-        Medicamento medicamento = Medicamento.builder()
-                .nombre("Paracetamol")
-                .requiereFormula(false)
-                .descripcion("Analgésico y antipirético")
-                .build();
-
         when(medicamentoRepository.findById(id)).thenReturn(Optional.empty());
 
-        // ACT & ASSERT
         MedicamentoNotFoundException ex = assertThrows(
                 MedicamentoNotFoundException.class,
-                () -> actualizarMedicamentoUseCase.ejecutar(id, medicamento)
+                () -> actualizarMedicamentoUseCase.ejecutar(id, NOMBRE, DESCRIPCION)
         );
 
-        assertEquals("Medicamento no encontrado con id: " + id, ex.getMessage());
+        assertTrue(ex.getMessage().contains(id.toString()));
         verify(medicamentoRepository, times(1)).findById(id);
         verify(medicamentoRepository, never()).save(any(Medicamento.class));
     }
 
     @Test
     void deberiaMantenerElMismoIdAlActualizar() {
-        // ARRANGE
         UUID id = UUID.randomUUID();
-
         Medicamento existente = Medicamento.builder()
                 .id(id)
                 .nombre("Ibuprofeno")
@@ -103,28 +82,12 @@ class ActualizarMedicamentoUseCaseTest {
                 .descripcion("Antiinflamatorio")
                 .build();
 
-        Medicamento nuevaData = Medicamento.builder()
-                .nombre("Amoxicilina")
-                .requiereFormula(true)
-                .descripcion("Antibiótico")
-                .build();
-
-        Medicamento guardado = Medicamento.builder()
-                .id(id)
-                .nombre("Amoxicilina")
-                .requiereFormula(true)
-                .descripcion("Antibiótico")
-                .build();
-
         when(medicamentoRepository.findById(id)).thenReturn(Optional.of(existente));
-        when(medicamentoRepository.save(any(Medicamento.class))).thenReturn(guardado);
+        when(medicamentoRepository.save(any(Medicamento.class))).thenAnswer(i -> i.getArgument(0));
 
-        // ACT
-        Medicamento resultado = actualizarMedicamentoUseCase.ejecutar(id, nuevaData);
+        Medicamento resultado = actualizarMedicamentoUseCase.ejecutar(id, "Amoxicilina", "Antibiótico de amplio espectro");
 
-        // ASSERT
         assertEquals(id, resultado.getId());
         assertEquals("Amoxicilina", resultado.getNombre());
-        assertTrue(resultado.getRequiereFormula());
     }
 }

@@ -26,6 +26,28 @@ public class Gestor {
     private Coordenadas coordenadas;
     private EstadoGestor estado;
 
+    public static Gestor crear(
+            String nombre,
+            String nit,
+            String direccion,
+            String telefono,
+            String email,
+            String passwordHash,
+            double latitud,
+            double longitud) {
+        return Gestor.builder()
+                .id(null)
+                .nombre(new Nombre(nombre))
+                .nit(new Nit(nit))
+                .direccion(direccion)
+                .telefono(new Telefono(telefono))
+                .email(new Email(email))
+                .passwordHash(passwordHash)
+                .coordenadas(Coordenadas.of(latitud, longitud))
+                .estado(EstadoGestor.INACTIVO)
+                .build();
+    }
+
 
     public void activar() {
         if (this.estado == EstadoGestor.SUSPENDIDO) {

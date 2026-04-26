@@ -18,13 +18,12 @@ import com.medisync.medisync.domain.repositories.IGestorRepository;
 public class GestorRepositoryImpl implements IGestorRepository {
 
     private final GestorJpaRepository jpaRepository;
-    private final GestorEntityMapper entityMapper;
 
     @Override
     public Gestor save(Gestor gestor) {
-        GestorEntity entity = entityMapper.toEntity(gestor);
+        GestorEntity entity = GestorEntityMapper.toEntity(gestor);
         GestorEntity saved = jpaRepository.save(entity);
-        return entityMapper.toDomain(saved);
+        return GestorEntityMapper.toDomain(saved);
     }
 
     @Override
@@ -35,13 +34,13 @@ public class GestorRepositoryImpl implements IGestorRepository {
     @Override
     public Optional<Gestor> findById(UUID id) {
         return jpaRepository.findById(id)
-                .map(entityMapper::toDomain);
+                .map(GestorEntityMapper::toDomain);
     }
 
     @Override
     public List<Gestor> findAll() {
         return jpaRepository.findAll().stream()
-                .map(entityMapper::toDomain)
+                .map(GestorEntityMapper::toDomain)
                 .toList();
     }
 }

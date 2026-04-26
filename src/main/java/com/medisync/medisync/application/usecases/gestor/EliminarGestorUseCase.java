@@ -3,14 +3,15 @@ package com.medisync.medisync.application.usecases.gestor;
 
 import java.util.UUID;
 
-import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
 import com.medisync.medisync.domain.repositories.IGestorRepository;
+import com.medisync.medisync.domain.repositories.IInventarioRepository;
 
 public class EliminarGestorUseCase {
 
     private final IGestorRepository gestorRepository;
 
-    public EliminarGestorUseCase(IGestorRepository gestorRepository) {
+    public EliminarGestorUseCase(IGestorRepository gestorRepository, IInventarioRepository inventarioRepository) {
         this.gestorRepository = gestorRepository;
     }
 

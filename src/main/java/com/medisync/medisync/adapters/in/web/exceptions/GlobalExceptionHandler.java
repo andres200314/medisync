@@ -2,6 +2,8 @@ package com.medisync.medisync.adapters.in.web.exceptions;
 
 import java.util.Map;
 
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.MedicamentoNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

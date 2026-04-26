@@ -33,24 +33,18 @@ class CrearMedicamentoUseCaseTest {
 
     @Test
     void deberiaCrearMedicamentoExitosamente() {
-        // ARRANGE
-        Medicamento medicamento = Medicamento.builder()
-                .nombre("Ibuprofeno")
-                .requiereFormula(false)
-                .descripcion("Antiinflamatorio y analgésico")
-                .build();
-        Medicamento medicamentoGuardado = Medicamento.builder()
-                .id(UUID.randomUUID())
-                .nombre("Ibuprofeno")
-                .requiereFormula(false)
-                .descripcion("Antiinflamatorio y analgésico")
-                .build();
-        when(medicamentoRepository.save(any(Medicamento.class))).thenReturn(medicamentoGuardado);
+        when(medicamentoRepository.save(any(Medicamento.class))).thenAnswer(i -> {
+            Medicamento m = i.getArgument(0);
+            return Medicamento.builder()
+                    .id(UUID.randomUUID())
+                    .nombre(m.getNombre())
+                    .requiereFormula(m.getRequiereFormula())
+                    .descripcion(m.getDescripcion())
+                    .build();
+        });
 
-        // ACT
-        Medicamento resultado = crearMedicamentoUseCase.ejecutar(medicamento);
+        Medicamento resultado = crearMedicamentoUseCase.ejecutar("Ibuprofeno", false, "Antiinflamatorio y analgésico");
 
-        // ASSERT
         assertNotNull(resultado.getId());
         assertEquals("Ibuprofeno", resultado.getNombre());
         assertFalse(resultado.getRequiereFormula());
@@ -59,18 +53,11 @@ class CrearMedicamentoUseCaseTest {
 
     @Test
     void deberiaMantenerPropiedadesCorrectamente() {
-        // ARRANGE
-        Medicamento medicamento = Medicamento.builder()
-                .nombre("Amoxicilina")
-                .requiereFormula(true)
-                .descripcion("Antibiótico de amplio espectro para infecciones bacterianas")
-                .build();
-        when(medicamentoRepository.save(any(Medicamento.class))).thenReturn(medicamento);
+        when(medicamentoRepository.save(any(Medicamento.class))).thenAnswer(i -> i.getArgument(0));
 
-        // ACT
-        Medicamento resultado = crearMedicamentoUseCase.ejecutar(medicamento);
+        Medicamento resultado = crearMedicamentoUseCase.ejecutar(
+                "Amoxicilina", true, "Antibiótico de amplio espectro para infecciones bacterianas");
 
-        // ASSERT
         assertEquals("Amoxicilina", resultado.getNombre());
         assertTrue(resultado.getRequiereFormula());
         assertEquals("Antibiótico de amplio espectro para infecciones bacterianas", resultado.getDescripcion());
@@ -78,31 +65,15 @@ class CrearMedicamentoUseCaseTest {
 
     @Test
     void deberiaLanzarExcepcionSiNombreEsVacio() {
-        // ARRANGE
-        Medicamento medicamento = Medicamento.builder()
-                .nombre("")
-                .requiereFormula(false)
-                .descripcion("Antiinflamatorio")
-                .build();
-
-        // ACT & ASSERT
         assertThrows(BusinessRuleViolationException.class,
-                () -> crearMedicamentoUseCase.ejecutar(medicamento));
+                () -> crearMedicamentoUseCase.ejecutar("", false, "Antiinflamatorio"));
         verify(medicamentoRepository, never()).save(any());
     }
 
     @Test
     void deberiaLanzarExcepcionSiDescripcionEsInsuficienteConFormula() {
-        // ARRANGE
-        Medicamento medicamento = Medicamento.builder()
-                .nombre("Amoxicilina")
-                .requiereFormula(true)
-                .descripcion("Antibiótico")
-                .build();
-
-        // ACT & ASSERT
         assertThrows(BusinessRuleViolationException.class,
-                () -> crearMedicamentoUseCase.ejecutar(medicamento));
+                () -> crearMedicamentoUseCase.ejecutar("Amoxicilina", true, "Antibiótico"));
         verify(medicamentoRepository, never()).save(any());
     }
 }

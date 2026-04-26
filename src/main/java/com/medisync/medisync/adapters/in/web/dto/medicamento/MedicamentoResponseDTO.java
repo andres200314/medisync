@@ -1,17 +1,22 @@
 package com.medisync.medisync.adapters.in.web.dto.medicamento;
 
-import lombok.*;
+
+import com.medisync.medisync.domain.models.Medicamento;
 
 import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class MedicamentoResponseDTO {
-    private UUID id;
-    private String nombre;
-    private Boolean requiereFormula;
-    private String descripcion;
+public record MedicamentoResponseDTO (
+     UUID id,
+     String nombre,
+     Boolean requiereFormula,
+     String descripcion
+) {
+    public static MedicamentoResponseDTO from(Medicamento medicamento) {
+        return new MedicamentoResponseDTO(
+                medicamento.getId(),
+                medicamento.getNombre(),
+                medicamento.getRequiereFormula(),
+                medicamento.getDescripcion()
+        );
+    }
 }

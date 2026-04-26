@@ -6,7 +6,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.medisync.medisync.adapters.in.web.exceptions.GestorNotFoundException;
+import com.medisync.medisync.domain.exceptions.GestorNotFoundException;
 import com.medisync.medisync.domain.valueobjects.Email;
 import com.medisync.medisync.domain.valueobjects.Nit;
 import com.medisync.medisync.domain.valueobjects.Nombre;
