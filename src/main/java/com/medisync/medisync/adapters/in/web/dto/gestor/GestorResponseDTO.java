@@ -10,6 +10,7 @@ public record GestorResponseDTO(
         String direccion,
         String telefono,
         String email,
+        String estado,
         double latitud,
         double longitud
 ) {
@@ -21,6 +22,7 @@ public record GestorResponseDTO(
                 gestor.getDireccion(),
                 gestor.getTelefono().valor(),
                 gestor.getEmail().valor(),
+                gestor.getEstado().name(),
                 gestor.getCoordenadas().latitud().doubleValue(),
                 gestor.getCoordenadas().longitud().doubleValue()
         );

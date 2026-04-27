@@ -1,16 +1,10 @@
 package com.medisync.medisync.infrastructure.config;
 
+import com.medisync.medisync.application.usecases.gestor.*;
 import com.medisync.medisync.application.usecases.inventario.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.medisync.medisync.application.usecases.gestor.ActualizarGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.CambiarPasswordGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.EliminarGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.LoginUseCase;
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestoresUseCase;
-import com.medisync.medisync.application.usecases.gestor.RegistrarGestorUseCase;
 import com.medisync.medisync.application.usecases.medicamento.ActualizarMedicamentoUseCase;
 import com.medisync.medisync.application.usecases.medicamento.CrearMedicamentoUseCase;
 import com.medisync.medisync.application.usecases.medicamento.EliminarMedicamentoUseCase;
@@ -127,6 +121,11 @@ public class BeanConfig {
     @Bean
     public ActualizarGestorUseCase actualizarGestorUseCase(IGestorRepository gestorRepository) {
         return new ActualizarGestorUseCase(gestorRepository);
+    }
+
+    @Bean
+    public CambiarEstadoGestorUseCase cambiarEstadoGestorUseCase(IGestorRepository gestorRepository) {
+        return new CambiarEstadoGestorUseCase(gestorRepository);
     }
 
     @Bean

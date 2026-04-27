@@ -1,5 +1,7 @@
 package com.medisync.medisync.adapters.in.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import com.medisync.medisync.infrastructure.security.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Autenticación", description = "Registro y login de gestores")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class AuthController {
     private final IGestorRepository gestorRepository;
     private final JwtService jwtService;
 
+    @Operation(summary = "Iniciar sesión", description = "Autentica un gestor y retorna un token JWT")
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request) {
         String token = loginUseCase.ejecutar(request.email(), request.password());
@@ -39,6 +43,7 @@ public class AuthController {
         return ResponseEntity.ok(AuthResponseDTO.of(token, request.email(), nombre));
     }
 
+    @Operation(summary = "Registrar gestor", description = "Crea una nueva farmacia y retorna un token JWT")
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO request) {
         Gestor gestor = registrarGestorUseCase.ejecutar(
