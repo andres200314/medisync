@@ -60,7 +60,7 @@ public class InventarioEntityMapper {
                 .build();
 
         return InventarioMedicamentoEntity.builder()
-                .id(item.medicamento().getId())
+                .id(null)
                 .inventario(inventarioEntity)
                 .medicamento(medicamentoEntity)
                 .cantidad(item.cantidad().valor())

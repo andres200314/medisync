@@ -16,5 +16,5 @@ public interface IInventarioRepository {
 
     List<Inventario> findAll();
 
-    Optional<Inventario> findByGestorId(UUID gestorId);  // ← Optional, no List
+    Optional<Inventario> findByGestorId(UUID gestorId);
 }

@@ -5,6 +5,7 @@ import com.medisync.medisync.domain.models.Gestor;
 import com.medisync.medisync.domain.models.Inventario;
 import com.medisync.medisync.domain.models.Medicamento;
 import com.medisync.medisync.domain.repositories.IInventarioRepository;
+import com.medisync.medisync.domain.repositories.IMedicamentoRepository;
 import com.medisync.medisync.domain.valueobjects.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,43 +15,45 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class VerificarDisponibilidadUseCaseTest {
+class BuscarDisponibilidadMedicamentoUseCaseTest {
 
     @Mock
     private IInventarioRepository inventarioRepository;
 
+    @Mock
+    private IMedicamentoRepository medicamentoRepository;
+
     @InjectMocks
-    private VerificarDisponibilidadUseCase verificarDisponibilidadUseCase;
+    private BuscarDisponibilidadMedicamentoUseCase useCase;
 
     @Test
-    void deberiaRetornarTrueCuandoMedicamentoTieneStock() {
-        // ARRANGE
-        UUID gestorId = UUID.randomUUID();
+    void deberiaRetornarInventariosConMedicamentoDisponible() {
+        String nombre = "Ibu";
         UUID medicamentoId = UUID.randomUUID();
 
-        Gestor gestor = Gestor.builder()
-                .id(gestorId)
-                .nombre(Nombre.of("Farmacia Central"))
-                .estado(EstadoGestor.ACTIVO)
-                .build();
-
-        Medicamento ibuprofeno = Medicamento.builder()
+        Medicamento medicamento = Medicamento.builder()
                 .id(medicamentoId)
                 .nombre("Ibuprofeno")
                 .requiereFormula(false)
                 .build();
 
+        Gestor gestor = Gestor.builder()
+                .id(UUID.randomUUID())
+                .nombre(Nombre.of("Farmacia"))
+                .estado(EstadoGestor.ACTIVO)
+                .coordenadas(Coordenadas.of(6.24, -75.57))
+                .build();
+
         ItemInventario item = new ItemInventario(
-                ibuprofeno,
-                Cantidad.of(50),
-                Precio.of(BigDecimal.valueOf(12500.00))
+                medicamento,
+                Cantidad.of(10),
+                Precio.of(BigDecimal.valueOf(1000))
         );
 
         Inventario inventario = Inventario.builder()
@@ -59,134 +62,75 @@ class VerificarDisponibilidadUseCaseTest {
                 .items(List.of(item))
                 .build();
 
-        when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.of(inventario));
+        when(medicamentoRepository.findByNombreContainingIgnoreCase(nombre))
+                .thenReturn(List.of(medicamento));
 
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(gestorId, medicamentoId);
+        when(inventarioRepository.findAll())
+                .thenReturn(List.of(inventario));
 
-        // ASSERT
-        assertTrue(resultado);
-        verify(inventarioRepository, times(1)).findByGestorId(gestorId);
+        List<Inventario> resultado = useCase.ejecutar(nombre);
+
+        assertEquals(1, resultado.size());
+        verify(medicamentoRepository).findByNombreContainingIgnoreCase(nombre);
+        verify(inventarioRepository).findAll();
     }
 
     @Test
-    void deberiaRetornarFalseCuandoMedicamentoNoTieneStock() {
-        // ARRANGE
-        UUID gestorId = UUID.randomUUID();
+    void deberiaRetornarListaVaciaSiNoHayCoincidencias() {
+        String nombre = "Paracetamol";
+
+        when(medicamentoRepository.findByNombreContainingIgnoreCase(nombre))
+                .thenReturn(List.of());
+
+        when(inventarioRepository.findAll())
+                .thenReturn(List.of());
+
+        List<Inventario> resultado = useCase.ejecutar(nombre);
+
+        assertTrue(resultado.isEmpty());
+        verify(medicamentoRepository).findByNombreContainingIgnoreCase(nombre);
+        verify(inventarioRepository).findAll();
+    }
+
+    @Test
+    void deberiaIgnorarInventariosSinStock() {
+        String nombre = "Ibu";
         UUID medicamentoId = UUID.randomUUID();
 
-        Gestor gestor = Gestor.builder()
-                .id(gestorId)
-                .nombre(Nombre.of("Farmacia Central"))
-                .estado(EstadoGestor.ACTIVO)
-                .build();
-
-        Medicamento ibuprofeno = Medicamento.builder()
+        Medicamento medicamento = Medicamento.builder()
                 .id(medicamentoId)
                 .nombre("Ibuprofeno")
                 .requiereFormula(false)
                 .build();
 
-        ItemInventario item = new ItemInventario(
-                ibuprofeno,
+        Gestor gestor = Gestor.builder()
+                .id(UUID.randomUUID())
+                .nombre(Nombre.of("Farmacia"))
+                .estado(EstadoGestor.ACTIVO)
+                .build();
+
+        ItemInventario itemSinStock = new ItemInventario(
+                medicamento,
                 Cantidad.of(0),
-                Precio.of(BigDecimal.valueOf(12500.00))
+                Precio.of(BigDecimal.valueOf(1000))
         );
 
         Inventario inventario = Inventario.builder()
                 .id(UUID.randomUUID())
                 .gestor(gestor)
-                .items(List.of(item))
+                .items(List.of(itemSinStock))
                 .build();
 
-        when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.of(inventario));
+        when(medicamentoRepository.findByNombreContainingIgnoreCase(nombre))
+                .thenReturn(List.of(medicamento));
 
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(gestorId, medicamentoId);
+        when(inventarioRepository.findAll())
+                .thenReturn(List.of(inventario));
 
-        // ASSERT
-        assertFalse(resultado);
-        verify(inventarioRepository, times(1)).findByGestorId(gestorId);
-    }
+        List<Inventario> resultado = useCase.ejecutar(nombre);
 
-    @Test
-    void deberiaRetornarFalseCuandoMedicamentoNoExisteEnInventario() {
-        // ARRANGE
-        UUID gestorId = UUID.randomUUID();
-        UUID medicamentoExistenteId = UUID.randomUUID();
-        UUID medicamentoNoExistenteId = UUID.randomUUID();
-
-        Gestor gestor = Gestor.builder()
-                .id(gestorId)
-                .nombre(Nombre.of("Farmacia Central"))
-                .estado(EstadoGestor.ACTIVO)
-                .build();
-
-        Medicamento ibuprofeno = Medicamento.builder()
-                .id(medicamentoExistenteId)
-                .nombre("Ibuprofeno")
-                .requiereFormula(false)
-                .build();
-
-        ItemInventario item = new ItemInventario(
-                ibuprofeno,
-                Cantidad.of(50),
-                Precio.of(BigDecimal.valueOf(12500.00))
-        );
-
-        Inventario inventario = Inventario.builder()
-                .id(UUID.randomUUID())
-                .gestor(gestor)
-                .items(List.of(item))
-                .build();
-
-        when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.of(inventario));
-
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(gestorId, medicamentoNoExistenteId);
-
-        // ASSERT
-        assertFalse(resultado);
-        verify(inventarioRepository, times(1)).findByGestorId(gestorId);
-    }
-
-    @Test
-    void deberiaRetornarFalseCuandoGestorNoTieneInventario() {
-        // ARRANGE
-        UUID gestorId = UUID.randomUUID();
-        UUID medicamentoId = UUID.randomUUID();
-
-        when(inventarioRepository.findByGestorId(gestorId))
-                .thenReturn(Optional.empty());
-
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(gestorId, medicamentoId);
-
-        // ASSERT
-        assertFalse(resultado);
-        verify(inventarioRepository, times(1)).findByGestorId(gestorId);
-    }
-
-    @Test
-    void deberiaRetornarFalseCuandoGestorIdEsNulo() {
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(null, UUID.randomUUID());
-
-        // ASSERT
-        assertFalse(resultado);
-        verify(inventarioRepository, never()).findByGestorId(any());
-    }
-
-    @Test
-    void deberiaRetornarFalseCuandoMedicamentoIdEsNulo() {
-        // ACT
-        boolean resultado = verificarDisponibilidadUseCase.ejecutar(UUID.randomUUID(), null);
-
-        // ASSERT
-        assertFalse(resultado);
-        verify(inventarioRepository, never()).findByGestorId(any());
+        assertTrue(resultado.isEmpty());
+        verify(medicamentoRepository).findByNombreContainingIgnoreCase(nombre);
+        verify(inventarioRepository).findAll();
     }
 }

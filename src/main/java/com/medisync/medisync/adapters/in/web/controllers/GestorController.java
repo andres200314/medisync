@@ -3,55 +3,33 @@ package com.medisync.medisync.adapters.in.web.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
+import com.medisync.medisync.application.usecases.gestor.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorRequestDTO;
 import com.medisync.medisync.adapters.in.web.dto.gestor.GestorResponseDTO;
-import com.medisync.medisync.application.usecases.gestor.ActualizarGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.EliminarGestorUseCase;
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestorPorIdUseCase;
-import com.medisync.medisync.application.usecases.gestor.ObtenerGestoresUseCase;
-import com.medisync.medisync.application.usecases.gestor.RegistrarGestorUseCase;
 
 import lombok.RequiredArgsConstructor;
 
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Gestores", description = "Gestión de farmacias")
 @RestController
 @RequestMapping("/api/gestores")
 @RequiredArgsConstructor
 public class GestorController {
 
-    private final RegistrarGestorUseCase registrarGestorUseCase;
     private final ObtenerGestoresUseCase obtenerGestoresUseCase;
     private final ObtenerGestorPorIdUseCase obtenerGestorPorIdUseCase;
     private final ActualizarGestorUseCase actualizarGestorUseCase;
     private final EliminarGestorUseCase eliminarGestorUseCase;
+    private final CambiarEstadoGestorUseCase cambiarEstadoGestorUseCase;
 
-    @PostMapping
-    public ResponseEntity<GestorResponseDTO> crear(@RequestBody GestorRequestDTO request) {
-        var gestor = registrarGestorUseCase.ejecutar(
-                request.nombre(),
-                request.nit(),
-                request.direccion(),
-                request.telefono(),
-                request.email(),
-                request.password(),
-                request.latitud(),
-                request.longitud()
-        );
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(GestorResponseDTO.from(gestor));
-    }
-
+    @Operation(summary = "Obtener todas las farmacias", description = "Retorna el listado de todas las farmacias registradas")
     @GetMapping
     public ResponseEntity<List<GestorResponseDTO>> obtenerTodos() {
         var gestores = obtenerGestoresUseCase.ejecutar().stream()
@@ -60,18 +38,21 @@ public class GestorController {
         return ResponseEntity.ok(gestores);
     }
 
+    @Operation(summary = "Obtener farmacia por ID", description = "Retorna una farmacia por su ID")
     @GetMapping("/{id}")
     public ResponseEntity<GestorResponseDTO> obtenerPorId(@PathVariable UUID id) {
         var gestor = obtenerGestorPorIdUseCase.ejecutar(id);
         return ResponseEntity.ok(GestorResponseDTO.from(gestor));
     }
 
-    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar perfil", description = "Actualiza los datos del gestor autenticado. Requiere token.")
+    @PutMapping
     public ResponseEntity<GestorResponseDTO> actualizar(
-            @PathVariable UUID id,
+            Authentication authentication,
             @RequestBody GestorRequestDTO request) {
+        UUID gestorId = (UUID) authentication.getPrincipal();
         var gestor = actualizarGestorUseCase.ejecutar(
-                id,
+                gestorId,
                 request.nombre(),
                 request.direccion(),
                 request.telefono(),
@@ -82,9 +63,19 @@ public class GestorController {
         return ResponseEntity.ok(GestorResponseDTO.from(gestor));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
-        eliminarGestorUseCase.ejecutar(id);
+    @Operation(summary = "Cambiar estado", description = "Alterna el estado del gestor autenticado entre ACTIVO e INACTIVO. Requiere token.")
+    @PatchMapping("/estado")
+    public ResponseEntity<GestorResponseDTO> cambiarEstado(Authentication authentication) {
+        UUID gestorId = (UUID) authentication.getPrincipal();
+        var gestor = cambiarEstadoGestorUseCase.ejecutar(gestorId);
+        return ResponseEntity.ok(GestorResponseDTO.from(gestor));
+    }
+
+    @Operation(summary = "Eliminar cuenta", description = "Elimina la cuenta del gestor autenticado. Requiere token.")
+    @DeleteMapping
+    public ResponseEntity<Void> eliminar(Authentication authentication) {
+        UUID gestorId = (UUID) authentication.getPrincipal();
+        eliminarGestorUseCase.ejecutar(gestorId);
         return ResponseEntity.noContent().build();
     }
 }
